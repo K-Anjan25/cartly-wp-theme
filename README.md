@@ -3,14 +3,16 @@
 The Cartly 2.0 design system as an installable WordPress theme, with first-class
 WooCommerce support.
 
-> **This theme is destined for its own repository.** It is developed inside the
-> platform monorepo and split out with history via
-> `tools/split-theme-repo.sh`. See `docs/09-frontend-strategy.md` for why.
-> Design tokens stay canonical in the platform repo — run
-> `./bin/sync-tokens.sh` (and `--check` in CI) so the two front ends cannot
-> silently drift. Same tokens, same components, same shell as the React
-storefront in [`frontend/`](../../frontend) — see [`design/`](../../design) for
-the wireframes and tokens both are generated from.
+Its sibling is the **platform repo**,
+[`ecommerce-microservices`](https://github.com/K-Anjan25/ecommerce-microservices) — Spring Boot services plus a React
+storefront rendering the same design language from the same tokens. That repo
+holds the canonical design kit
+([`design/`](https://github.com/K-Anjan25/ecommerce-microservices/tree/main/design): tokens, wireframes, palettes) and the
+reasoning behind the two-repo split
+([`docs/09-frontend-strategy.md`](https://github.com/K-Anjan25/ecommerce-microservices/blob/main/docs/09-frontend-strategy.md)).
+
+> **Design tokens are pulled, not authored here.** Run `./bin/sync-tokens.sh`
+> (and `--check` in CI) so the two front ends cannot silently drift.
 
 ![Cartly theme](screenshot.png)
 
@@ -21,8 +23,10 @@ the wireframes and tokens both are generated from.
 ### Option A — upload a zip
 
 ```bash
-cd wordpress
-zip -r cartly.zip cartly -x 'cartly/node_modules/*' 'cartly/assets/src/*' 'cartly/bin/*'
+git clone https://github.com/K-Anjan25/cartly-wp-theme.git cartly
+zip -r cartly.zip cartly \
+  -x 'cartly/.git/*' 'cartly/node_modules/*' 'cartly/assets/src/*' \
+     'cartly/bin/*' 'cartly/ci/*' 'cartly/.github/*'
 ```
 
 Then **Appearance → Themes → Add New → Upload Theme** and activate.
@@ -30,7 +34,8 @@ Then **Appearance → Themes → Add New → Upload Theme** and activate.
 ### Option B — copy into the themes folder
 
 ```bash
-cp -r wordpress/cartly /path/to/wp-content/themes/cartly
+git clone https://github.com/K-Anjan25/cartly-wp-theme.git \
+  /path/to/wp-content/themes/cartly
 ```
 
 `assets/css/cartly.css` is committed, so the theme works immediately — you only
@@ -107,19 +112,19 @@ need Node if you intend to change the styles.
 Styles are Tailwind, compiled from `assets/src/`:
 
 ```bash
-cd wordpress/cartly
 npm install
 npm run dev      # watch
 npm run build    # minified -> assets/css/cartly.css
 ```
 
 - `assets/src/tokens.css` — the colour tokens, `:root` (light) and `.dark`.
-  **This file is generated from the platform repo, not edited here.** Change
-  `frontend/src/tokens.css` there, then run `./bin/sync-tokens.sh` and rebuild.
-  CI fails the build if the two differ.
+  **Generated from the platform repo, not edited here.** Change
+  `frontend/src/tokens.css` [over there](https://github.com/K-Anjan25/ecommerce-microservices/blob/main/frontend/src/tokens.css),
+  then run `./bin/sync-tokens.sh` and rebuild. CI fails the build if they
+  differ.
 - `assets/src/theme.css` — the component layer plus the WordPress/WooCommerce
   integration styles.
-- `tailwind.config.js` — mirrors `frontend/tailwind.config.js`.
+- `tailwind.config.js` — mirrors the platform repo's `frontend/tailwind.config.js`.
 
 Two token rules matter:
 
@@ -160,7 +165,8 @@ cartly/
 │   ├── cart/cart-empty.php
 │   └── global/quantity-input.php
 ├── assets/{src,css,js}
-├── bin/lint-php.py               structural linter (see below)
+├── bin/                          lint, preview and token-sync tooling
+├── .github/workflows/ci.yml      php -l · lint · build · drift check
 └── screenshot.png
 ```
 
@@ -180,7 +186,6 @@ demo, using [WordPress Playground](https://wordpress.github.io/wordpress-playgro
 required**, just Node.
 
 ```bash
-cd wordpress/cartly
 ./bin/preview.sh              # WordPress + WooCommerce + demo store
 ./bin/preview.sh --no-woo     # theme only; works without network
 PORT=9000 ./bin/preview.sh    # pick a port
@@ -200,11 +205,12 @@ The seeder is **preview-only** — it is never loaded by the theme.
 
 ## 8. Checks
 
-No PHP runtime is available in this repository's CI sandbox, so the theme ships
-a structural linter that understands PHP islands, quoting and heredocs:
+CI runs `php -l` over every template, the structural linter below, a stylesheet
+build, and the token drift check. Locally, the structural linter needs only
+Python — it understands PHP islands, quoting and heredocs:
 
 ```bash
-python3 wordpress/cartly/bin/lint-php.py
+python3 bin/lint-php.py
 ```
 
 It verifies balanced delimiters, matched `if/endif`-style blocks, `ABSPATH`
@@ -213,7 +219,7 @@ shipping to a real site, also run the official tooling:
 
 ```bash
 composer global require wp-coding-standards/wpcs
-phpcs --standard=WordPress wordpress/cartly
+phpcs --standard=WordPress --ignore=node_modules,assets/css .
 ```
 
 ---
@@ -221,7 +227,7 @@ phpcs --standard=WordPress wordpress/cartly
 ## 9. Not included
 
 This is a **theme**, not a port of the Cartly backend. It renders WooCommerce
-data, not the Spring Boot services. The features the React storefront gets from
+data, not the [Spring Boot services](https://github.com/K-Anjan25/ecommerce-microservices). The features the React storefront gets from
 `commerce-service` — loyalty points, referrals, gift cards, price-drop alerts,
 the returns workflow — would each need a WooCommerce plugin or an integration
 layer against the API gateway. The theme's design language already covers those
