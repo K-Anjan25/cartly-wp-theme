@@ -7,7 +7,7 @@
     { "step": "activateTheme", "themeFolderName": "cartly" },
     {
       "step": "runPHP",
-      "code": "<?php require_once '/wordpress/wp-load.php'; require_once '/wordpress/preview-seed.php';"
+      "code": "<?php require_once '/wordpress/wp-load.php'; require_once '/wordpress/wp-content/themes/cartly/bin/preview-seed.php';"
     }
   ]
 }
