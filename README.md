@@ -1,7 +1,14 @@
 # Cartly — WordPress theme
 
 The Cartly 2.0 design system as an installable WordPress theme, with first-class
-WooCommerce support. Same tokens, same components, same shell as the React
+WooCommerce support.
+
+> **This theme is destined for its own repository.** It is developed inside the
+> platform monorepo and split out with history via
+> `tools/split-theme-repo.sh`. See `docs/09-frontend-strategy.md` for why.
+> Design tokens stay canonical in the platform repo — run
+> `./bin/sync-tokens.sh` (and `--check` in CI) so the two front ends cannot
+> silently drift. Same tokens, same components, same shell as the React
 storefront in [`frontend/`](../../frontend) — see [`design/`](../../design) for
 the wireframes and tokens both are generated from.
 
@@ -107,7 +114,9 @@ npm run build    # minified -> assets/css/cartly.css
 ```
 
 - `assets/src/tokens.css` — the colour tokens, `:root` (light) and `.dark`.
-  **This file is a copy of `frontend/src/tokens.css`** — change both, or neither.
+  **This file is generated from the platform repo, not edited here.** Change
+  `frontend/src/tokens.css` there, then run `./bin/sync-tokens.sh` and rebuild.
+  CI fails the build if the two differ.
 - `assets/src/theme.css` — the component layer plus the WordPress/WooCommerce
   integration styles.
 - `tailwind.config.js` — mirrors `frontend/tailwind.config.js`.

@@ -1,0 +1,60 @@
+# Copy this file to .github/workflows/ci.yml in the standalone theme repo.
+#
+# It is parked here (not under .github/) because in the monorepo this directory
+# is not a workflow root, and the monorepo's push token cannot write workflows.
+#
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  theme:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          tools: composer
+
+      - name: Lint every PHP file
+        run: |
+          find . -name '*.php' -not -path './node_modules/*' -print0 \
+            | xargs -0 -n1 php -l
+
+      - name: Structural lint
+        run: python3 bin/lint-php.py
+
+      - name: WordPress coding standards
+        continue-on-error: true
+        run: |
+          composer global require --no-interaction --quiet \
+            wp-coding-standards/wpcs:^3 dealerdirect/phpcodesniffer-composer-installer
+          "$HOME/.composer/vendor/bin/phpcs" --standard=WordPress \
+            --ignore=node_modules,assets/css . || true
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Build the stylesheet
+        run: |
+          npm ci
+          npm run build
+
+      - name: Fail if the committed stylesheet is stale
+        run: |
+          if ! git diff --quiet -- assets/css/cartly.css; then
+            echo "assets/css/cartly.css is out of date — run 'npm run build' and commit it."
+            git diff --stat -- assets/css/cartly.css
+            exit 1
+          fi
+
+      - name: Fail if design tokens drifted from the platform repo
+        run: ./bin/sync-tokens.sh --check

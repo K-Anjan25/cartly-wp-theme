@@ -1,5 +1,5 @@
 /**
- * Cartly 2.0 — colour tokens as CSS custom properties (WordPress theme).
+ * Cartly 2.0 — colour tokens as CSS custom properties.
  *
  * Values are space-separated RGB channels so Tailwind can apply opacity
  * modifiers (`bg-paper/90`) through `rgb(var(--x) / <alpha-value>)`.
