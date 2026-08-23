@@ -163,7 +163,33 @@ hooks survive upgrades. Only four templates are overridden, each with the
 
 ---
 
-## 7. Checks
+## 7. Preview it without installing anything
+
+`bin/preview.sh` boots a throwaway WordPress with the theme active and a seeded
+demo, using [WordPress Playground](https://wordpress.github.io/wordpress-playground/)
+— PHP and WordPress compiled to WebAssembly. **No PHP, no MySQL, no web server
+required**, just Node.
+
+```bash
+cd wordpress/cartly
+./bin/preview.sh              # WordPress + WooCommerce + demo store
+./bin/preview.sh --no-woo     # theme only; works without network
+PORT=9000 ./bin/preview.sh    # pick a port
+```
+
+Open the printed URL — you are logged in as admin, so the Customizer, menus and
+widget screens are all reachable.
+
+| File | |
+|---|---|
+| `bin/preview.sh` | launcher |
+| `bin/preview-blueprint.json` | Playground blueprint incl. WooCommerce |
+| `bin/preview-blueprint-no-woo.json` | offline fallback |
+| `bin/preview-seed.php` | seeds settings, hero, menus, widgets, categories and content |
+
+The seeder is **preview-only** — it is never loaded by the theme.
+
+## 8. Checks
 
 No PHP runtime is available in this repository's CI sandbox, so the theme ships
 a structural linter that understands PHP islands, quoting and heredocs:
@@ -183,7 +209,7 @@ phpcs --standard=WordPress wordpress/cartly
 
 ---
 
-## 8. Not included
+## 9. Not included
 
 This is a **theme**, not a port of the Cartly backend. It renders WooCommerce
 data, not the Spring Boot services. The features the React storefront gets from
