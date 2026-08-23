@@ -1,0 +1,424 @@
+@import "./tokens.css";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ==========================================================================
+   Cartly WordPress theme — base
+   Ported from frontend/src/style.css so both front ends share one language.
+   ========================================================================== */
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-canvas text-ink antialiased;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: "Inter Tight", Inter, system-ui, sans-serif;
+    letter-spacing: -0.02em;
+    @apply font-bold text-ink;
+  }
+
+  a {
+    @apply text-brand underline-offset-2;
+  }
+
+  ::selection {
+    background-color: rgb(var(--c-brand));
+    color: rgb(var(--c-oncontrast));
+  }
+
+  :focus:not(:focus-visible) {
+    outline: none;
+  }
+  :focus-visible {
+    outline: 2px solid rgb(var(--c-brand) / 0.55);
+    outline-offset: 2px;
+    border-radius: 6px;
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: rgb(var(--scrollbar-thumb) / 0.2);
+    border-radius: 999px;
+    border: 3px solid transparent;
+    background-clip: content-box;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgb(var(--scrollbar-thumb) / 0.36);
+    border: 3px solid transparent;
+    background-clip: content-box;
+  }
+}
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: none; }
+}
+
+.animate-fade-up {
+  animation: fade-up 0.35s cubic-bezier(0.21, 1.02, 0.73, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .animate-fade-up { animation: none; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* ==========================================================================
+   Components
+   ========================================================================== */
+@layer components {
+  /* ---- layout ---- */
+  .page-shell {
+    @apply mx-auto w-full max-w-container px-4 sm:px-6 lg:px-8;
+  }
+
+  .page-header {
+    @apply mb-6 sm:mb-8;
+  }
+
+  .eyebrow {
+    @apply text-eyebrow font-bold uppercase text-ink-muted;
+  }
+
+  .page-title {
+    @apply font-heading text-2xl font-bold tracking-tight text-ink sm:text-[2rem];
+  }
+
+  .page-subtitle {
+    @apply mt-1 max-w-2xl text-sm text-ink-soft;
+  }
+
+  .section-title {
+    @apply font-heading text-xl font-bold tracking-tight text-ink sm:text-2xl;
+  }
+
+  /* ---- surfaces ---- */
+  .panel {
+    @apply rounded-lg border border-line bg-paper;
+  }
+
+  .panel-raised {
+    @apply rounded-lg border border-line bg-paper shadow-card;
+  }
+
+  .surface-contrast {
+    @apply bg-contrast text-oncontrast;
+  }
+
+  .grain {
+    background-image: radial-gradient(rgba(255, 255, 255, 0.07) 1px, transparent 1px);
+    background-size: 14px 14px;
+  }
+
+  /* ---- actions ---- */
+  .primary-button {
+    @apply inline-flex items-center justify-center gap-2 rounded-sm bg-brand px-4 py-2.5 text-sm font-semibold text-oncontrast no-underline transition hover:bg-brand-main disabled:cursor-not-allowed disabled:opacity-60;
+  }
+
+  .dark-button {
+    @apply inline-flex items-center justify-center gap-2 rounded-sm bg-contrast px-4 py-2.5 text-sm font-semibold text-oncontrast no-underline transition hover:bg-contrast-lift;
+  }
+
+  .accent-button {
+    @apply inline-flex items-center justify-center gap-2 rounded-sm bg-accent px-4 py-2.5 text-sm font-bold text-ink no-underline transition hover:bg-accent-dark;
+  }
+
+  .secondary-button {
+    @apply inline-flex items-center justify-center gap-2 rounded-sm border border-line bg-paper px-4 py-2.5 text-sm font-semibold text-ink no-underline transition hover:border-brand hover:bg-brand-tint hover:text-brand;
+  }
+
+  .icon-button {
+    @apply inline-flex h-10 w-10 items-center justify-center rounded-full text-ink-soft no-underline transition hover:bg-brand-soft hover:text-brand;
+  }
+
+  /* ---- chips & badges ---- */
+  .chip {
+    @apply inline-flex shrink-0 items-center gap-1.5 rounded-full border border-line bg-paper px-3.5 py-1.5 text-xs font-semibold text-ink-soft no-underline transition hover:border-ink-faint hover:text-ink;
+  }
+
+  .chip-active {
+    @apply border-brand bg-brand-soft text-brand hover:border-brand hover:text-brand;
+  }
+
+  .chip-ink {
+    @apply border-contrast bg-contrast text-oncontrast hover:text-oncontrast;
+  }
+
+  .badge-sale {
+    @apply inline-flex items-center rounded-full bg-state-danger px-2.5 py-1 text-[0.625rem] font-bold uppercase tracking-wide text-white;
+  }
+
+  .badge-stock-in {
+    @apply inline-flex items-center rounded-full bg-state-success-soft px-2.5 py-1 text-[0.625rem] font-bold uppercase tracking-wide text-state-success-on;
+  }
+
+  .badge-stock-low {
+    @apply inline-flex items-center rounded-full bg-state-warning-soft px-2.5 py-1 text-[0.625rem] font-bold uppercase tracking-wide text-state-warning-on;
+  }
+
+  .badge-stock-out {
+    @apply inline-flex items-center rounded-full bg-state-danger-soft px-2.5 py-1 text-[0.625rem] font-bold uppercase tracking-wide text-state-danger-on;
+  }
+
+  /* ---- form ---- */
+  .input-control {
+    @apply h-11 w-full rounded-sm border border-line bg-paper px-3 text-sm text-ink outline-none transition placeholder:text-ink-muted focus:border-brand focus:ring-2 focus:ring-brand/15;
+  }
+
+  .price-text {
+    @apply font-heading font-bold text-ink;
+  }
+
+  .product-grid {
+    @apply grid grid-cols-2 gap-3 sm:gap-5 md:grid-cols-3 xl:grid-cols-4;
+  }
+}
+
+/* ==========================================================================
+   WordPress core + WooCommerce integration
+   Core markup we do not control gets styled here rather than fought with.
+   ========================================================================== */
+@layer components {
+  /* --- editor content ------------------------------------------------- */
+  .entry-content {
+    @apply text-[0.9375rem] leading-relaxed text-ink-soft;
+  }
+  .entry-content > * + * {
+    @apply mt-5;
+  }
+  .entry-content h1 { @apply font-heading text-3xl text-ink; }
+  .entry-content h2 { @apply font-heading text-2xl text-ink; }
+  .entry-content h3 { @apply font-heading text-xl text-ink; }
+  .entry-content h4 { @apply font-heading text-lg text-ink; }
+  .entry-content p  { @apply max-w-[68ch]; }
+  .entry-content a  { @apply text-brand underline; }
+  .entry-content ul { @apply max-w-[68ch] list-disc space-y-1.5 pl-6; }
+  .entry-content ol { @apply max-w-[68ch] list-decimal space-y-1.5 pl-6; }
+  .entry-content img,
+  .entry-content .wp-block-image img {
+    @apply rounded-lg border border-line;
+  }
+  .entry-content blockquote {
+    @apply border-l-4 border-brand bg-brand-tint px-5 py-4 text-ink;
+  }
+  .entry-content pre {
+    @apply overflow-x-auto rounded-lg bg-contrast p-4 font-mono text-xs text-oncontrast;
+  }
+  .entry-content code {
+    @apply rounded-xs bg-sunken px-1.5 py-0.5 font-mono text-[0.8125rem] text-ink;
+  }
+  .entry-content pre code { @apply bg-transparent p-0 text-oncontrast; }
+  .entry-content table {
+    @apply w-full border-collapse overflow-hidden rounded-lg border border-line text-sm;
+  }
+  .entry-content th {
+    @apply border-b border-line bg-canvas px-4 py-2.5 text-left text-eyebrow font-bold uppercase text-ink-muted;
+  }
+  .entry-content td { @apply border-b border-line px-4 py-3; }
+  .entry-content hr { @apply border-line; }
+
+  .alignwide  { @apply -mx-4 max-w-none sm:-mx-8; }
+  .alignfull  { @apply -mx-4 max-w-none sm:-mx-8; }
+  .alignleft  { @apply float-left mr-6 mb-4; }
+  .alignright { @apply float-right ml-6 mb-4; }
+  .aligncenter { @apply mx-auto block; }
+
+  .screen-reader-text {
+    @apply absolute -m-px h-px w-px overflow-hidden whitespace-nowrap border-0 p-0;
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
+  }
+  .screen-reader-text:focus {
+    @apply left-4 top-4 z-[100] m-0 h-auto w-auto rounded-sm bg-paper px-4 py-2 text-sm font-semibold text-ink shadow-pop;
+    clip: auto;
+    clip-path: none;
+  }
+
+  /* --- comments -------------------------------------------------------- */
+  .comment-list { @apply space-y-4 list-none pl-0; }
+  .comment-list .children { @apply mt-4 space-y-4 border-l border-line pl-5; }
+  .comment-body { @apply panel p-5; }
+  .comment-author img { @apply rounded-full; }
+  .comment-form input[type="text"],
+  .comment-form input[type="email"],
+  .comment-form input[type="url"],
+  .comment-form textarea { @apply input-control; }
+  .comment-form textarea { @apply h-auto py-2.5; }
+  .comment-form .submit { @apply primary-button cursor-pointer border-0; }
+
+  /* --- pagination ------------------------------------------------------ */
+  .cartly-pagination .page-numbers {
+    @apply inline-flex h-10 min-w-10 items-center justify-center rounded-sm border border-line bg-paper px-3 text-sm font-semibold text-ink-soft no-underline transition hover:border-ink-faint hover:text-ink;
+  }
+  .cartly-pagination .page-numbers.current {
+    @apply border-contrast bg-contrast text-oncontrast;
+  }
+  .cartly-pagination .page-numbers.dots {
+    @apply border-transparent bg-transparent;
+  }
+
+  /* --- widgets --------------------------------------------------------- */
+  .widget { @apply panel p-5; }
+  .widget-title { @apply mb-3 font-heading text-sm font-bold text-ink; }
+  .widget ul { @apply space-y-2 list-none pl-0 text-sm; }
+  .widget ul a { @apply text-ink-soft no-underline hover:text-brand; }
+}
+
+/* --- WooCommerce ------------------------------------------------------- */
+@layer components {
+  .woocommerce-message,
+  .woocommerce-info,
+  .woocommerce-error {
+    @apply mb-6 list-none rounded-sm border px-5 py-4 text-sm;
+  }
+  .woocommerce-message {
+    @apply border-state-success/30 bg-state-success-soft text-state-success-on;
+  }
+  .woocommerce-info {
+    @apply border-line bg-sunken text-ink-soft;
+  }
+  .woocommerce-error {
+    @apply border-state-danger/30 bg-state-danger-soft text-state-danger-on;
+  }
+  .woocommerce-message .button,
+  .woocommerce-info .button {
+    @apply secondary-button ml-3 !py-1.5;
+  }
+
+  .woocommerce .button,
+  .woocommerce a.button,
+  .woocommerce button.button,
+  .woocommerce input.button,
+  .woocommerce #respond input#submit {
+    @apply inline-flex items-center justify-center gap-2 rounded-sm border-0 bg-contrast px-4 py-2.5 text-sm font-semibold text-oncontrast no-underline transition hover:bg-brand;
+  }
+  .woocommerce .button.alt,
+  .woocommerce a.button.alt,
+  .woocommerce button.button.alt,
+  .woocommerce input.button.alt,
+  .woocommerce #respond input#submit.alt {
+    @apply bg-brand hover:bg-brand-main;
+  }
+  .woocommerce .button:disabled,
+  .woocommerce .button.disabled {
+    @apply cursor-not-allowed opacity-60;
+  }
+
+  .woocommerce form .form-row input.input-text,
+  .woocommerce form .form-row textarea,
+  .woocommerce form .form-row select,
+  .woocommerce .select2-container .select2-selection--single {
+    @apply input-control;
+  }
+  .woocommerce form .form-row textarea { @apply h-auto py-2.5; }
+  .woocommerce form .form-row label { @apply eyebrow mb-1.5 block; }
+
+  .woocommerce .quantity .qty {
+    @apply h-10 w-16 rounded-sm border border-line bg-paper text-center text-sm text-ink;
+  }
+
+  .woocommerce table.shop_table {
+    @apply w-full border-separate border-spacing-0 overflow-hidden rounded-lg border border-line bg-paper text-sm;
+  }
+  .woocommerce table.shop_table th {
+    @apply border-b border-line bg-canvas px-4 py-3 text-left text-eyebrow font-bold uppercase text-ink-muted;
+  }
+  .woocommerce table.shop_table td {
+    @apply border-b border-line px-4 py-3.5 align-middle;
+  }
+  .woocommerce table.shop_table tr:last-child td { @apply border-b-0; }
+
+  .woocommerce .cart_totals h2,
+  .woocommerce-checkout h3 {
+    @apply mb-4 font-heading text-base font-bold text-ink;
+  }
+
+  .woocommerce ul.order_details {
+    @apply grid list-none gap-3 pl-0 sm:grid-cols-2 lg:grid-cols-4;
+  }
+  .woocommerce ul.order_details li {
+    @apply panel p-4 text-eyebrow font-bold uppercase text-ink-muted;
+  }
+  .woocommerce ul.order_details li strong {
+    @apply mt-1 block font-heading text-base font-bold normal-case tracking-normal text-ink;
+  }
+
+  .woocommerce nav.woocommerce-pagination ul {
+    @apply flex list-none gap-2 border-0 pl-0;
+  }
+  .woocommerce nav.woocommerce-pagination ul li {
+    @apply border-0;
+  }
+  .woocommerce nav.woocommerce-pagination ul li a,
+  .woocommerce nav.woocommerce-pagination ul li span {
+    @apply inline-flex h-10 min-w-10 items-center justify-center rounded-sm border border-line bg-paper px-3 text-sm font-semibold text-ink-soft no-underline transition hover:border-ink-faint hover:text-ink;
+  }
+  .woocommerce nav.woocommerce-pagination ul li span.current {
+    @apply border-contrast bg-contrast text-oncontrast;
+  }
+
+  .woocommerce .star-rating span::before,
+  .woocommerce p.stars a::before {
+    color: rgb(245 158 11);
+  }
+
+  .woocommerce div.product .woocommerce-tabs ul.tabs {
+    @apply flex list-none flex-wrap gap-2 border-0 p-0;
+  }
+  .woocommerce div.product .woocommerce-tabs ul.tabs::before { @apply hidden; }
+  .woocommerce div.product .woocommerce-tabs ul.tabs li {
+    @apply chip border-line bg-paper p-0;
+  }
+  .woocommerce div.product .woocommerce-tabs ul.tabs li::before,
+  .woocommerce div.product .woocommerce-tabs ul.tabs li::after { @apply hidden; }
+  .woocommerce div.product .woocommerce-tabs ul.tabs li a {
+    @apply px-1 py-0 text-xs font-semibold no-underline;
+  }
+  .woocommerce div.product .woocommerce-tabs ul.tabs li.active {
+    @apply border-contrast bg-contrast;
+  }
+  .woocommerce div.product .woocommerce-tabs ul.tabs li.active a {
+    @apply text-oncontrast;
+  }
+
+  .woocommerce div.product form.cart .variations {
+    @apply w-full border-separate;
+  }
+  .woocommerce div.product form.cart .variations td { @apply py-2; }
+
+  .woocommerce-breadcrumb {
+    @apply mb-4 text-xs font-semibold text-ink-muted;
+  }
+  .woocommerce-breadcrumb a { @apply text-ink-muted no-underline hover:text-ink; }
+
+  .woocommerce .woocommerce-result-count { @apply text-sm text-ink-soft; }
+  .woocommerce .woocommerce-ordering select { @apply input-control !h-10 w-auto; }
+
+  .woocommerce-MyAccount-navigation ul { @apply space-y-1 list-none pl-0; }
+  .woocommerce-MyAccount-navigation li a {
+    @apply block rounded-sm px-3 py-2.5 text-sm font-semibold text-ink-soft no-underline transition hover:bg-sunken hover:text-ink;
+  }
+  .woocommerce-MyAccount-navigation li.is-active a {
+    @apply bg-brand-soft text-brand;
+  }
+}
