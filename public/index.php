@@ -93,6 +93,18 @@ function sideIcon( string $key ): string {
 	return $i[ $key ] ?? '•';
 }
 
+// PayKaro logo mark: a rounded tile with a stylised "P" (the brand glyph).
+function logoMark( string $class = 'pkg-side-logo' ): string {
+	// Stylised "P": a vertical stem + a rounded bowl, with a small leaf accent
+	// on the counter, matching the Northstar reference mark.
+	$svg = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">'
+		. '<path d="M9 4h5.2c3 0 5.3 2.1 5.3 5s-2.3 5-5.3 5H12v4H9V4z" fill="#fff"/>'
+		. '<path d="M12 7h2.4a2 2 0 0 1 0 4H12V7z" fill="#10b981"/>'
+		. '<circle cx="16.6" cy="18.4" r="1.6" fill="#22c39a"/>'
+		. '</svg>';
+	return '<span class="' . e( $class ) . '">' . $svg . '</span>';
+}
+
 // Health-status badge: Paid / Due Soon / Overdue (bucket) — matches the reference table.
 function healthBadge( array $i ): string {
 	if ( 'settled' === $i['status'] ) {
@@ -151,7 +163,7 @@ function layout( array $config, string $title, string $content, string $active, 
 
 		<aside class="pkg-side">
 			<a class="pkg-side-brand" href="/">
-				<span class="pkg-side-logo">₹</span>
+				<?php echo logoMark(); ?>
 				<span>
 					<div class="pkg-side-brand-name"><?php echo e( $config['name'] ); ?></div>
 					<div class="pkg-side-brand-tag"><?php echo e( $b ); ?></div>
@@ -225,7 +237,7 @@ function loginPage( array $config ): string {
 		<!-- Brand panel -->
 		<div style="flex:0 0 44%;max-width:44%;background:linear-gradient(160deg,var(--n-side) 0%,var(--n-side-2) 60%,#0a2b21 100%);color:#fff;display:flex;flex-direction:column;justify-content:space-between;padding:2.6rem 2.8rem;">
 			<div style="display:flex;align-items:center;gap:.75rem;">
-				<span class="pkg-side-logo">₹</span>
+				<?php echo logoMark(); ?>
 				<div>
 					<div style="font-weight:800;font-size:1.25rem;letter-spacing:-.02em;"><?php echo e( $config['name'] ); ?></div>
 					<div style="font-size:.78rem;color:var(--n-side-mute);"><?php echo e( $config['tagline'] ); ?></div>
