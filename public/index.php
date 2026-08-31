@@ -93,22 +93,33 @@ function sideIcon( string $key ): string {
 	return $i[ $key ] ?? '•';
 }
 
-// PayKaro logo mark: a two-tone, angular geometric "P" with a beveled outline,
-// a dark parallelogram counter (negative space), and a darker-green diagonal
-// facet across the lower stem. Sits directly on the dark sidebar (no tile).
+// Two-tone PayKaro wordmark: "Pay" in white + "Karo" in brand green,
+// matching the Northstar reference lockup.
+function brandWordmark(): string {
+	$name = 'PayKaro';
+	// Split on the camelCase boundary: "Pay" (white) + "Karo" (green).
+	$parts = preg_split( '/(?<=[a-z])(?=[A-Z])/', $name );
+	if ( 2 === count( $parts ) ) {
+		return '<span class="pkg-brand-a">' . e( $parts[0] ) . '</span><span class="pkg-brand-b">' . e( $parts[1] ) . '</span>';
+	}
+	return e( $name );
+}
+
+// PayKaro logo mark: a clean rounded green "P" (round bowl + rounded counter),
+// with a subtle darker-green facet on the lower stem. Sits directly on the
+// dark sidebar (no tile), matching the Northstar reference mark.
 function logoMark( string $class = 'pkg-side-logo' ): string {
-	$light = '#3ecf8e'; // bright green (main body)
-	$dark  = '#18a05a';  // deeper green (facet)
-	$navy  = '#0e2038';  // counter negative space (matches the dark sidebar)
+	$green = '#22bb70'; // main green body
+	$deep  = '#159a56';  // deeper green (stem facet)
 	$svg = '<svg width="30" height="30" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">'
-		// Bright-green beveled "P" silhouette.
-		. '<path fill="' . $light . '" d="'
-		. 'M13 6 L31 6 L37 12 L38 19 L32 25 L19 25 L19 34 L14 40 L8 35 L8 13 Z '
+		// Clean rounded "P": round bowl on the right, straight stem; counter is
+		// the rounded hole created by the even-odd subpath.
+		. '<path fill="' . $green . '" fill-rule="evenodd" clip-rule="evenodd" d="'
+		. 'M8 4 L20 4 C30 4 34 8 34 14 C34 20 30 24 20 24 L15 24 L15 40 L8 40 Z '
+		. 'M15 10 L20 10 C24 10 26 11.7 26 14 C26 16.3 24 18 20 18 L15 18 Z'
 		. '"/>'
-		// Dark (negative-space) slanted parallelogram counter.
-		. '<path fill="' . $navy . '" d="M15 10 L30 10 L27 21 L12 21 Z"/>'
-		// Darker-green diagonal facet across the lower stem (the "fold").
-		. '<path fill="' . $dark . '" d="M8 25 L19 22 L19 34 L14 40 L8 35 Z"/>'
+		// Slightly deeper green facet on the lower stem (gives a subtle two-tone).
+		. '<path fill="' . $deep . '" d="M8 30 L15 24 L15 40 L8 40 Z"/>'
 		. '</svg>';
 	return '<span class="' . e( $class ) . '">' . $svg . '</span>';
 }
@@ -173,7 +184,7 @@ function layout( array $config, string $title, string $content, string $active, 
 			<a class="pkg-side-brand" href="/">
 				<?php echo logoMark(); ?>
 				<span>
-					<div class="pkg-side-brand-name"><?php echo e( $config['name'] ); ?></div>
+					<div class="pkg-side-brand-name"><?php echo brandWordmark(); ?></div>
 					<div class="pkg-side-brand-tag"><?php echo e( $b ); ?></div>
 				</span>
 			</a>
@@ -247,7 +258,7 @@ function loginPage( array $config ): string {
 			<div style="display:flex;align-items:center;gap:.75rem;">
 				<?php echo logoMark(); ?>
 				<div>
-					<div style="font-weight:900;font-size:1.3rem;letter-spacing:-.02em;line-height:1.1;"><?php echo e( $config['name'] ); ?></div>
+					<div style="font-weight:900;font-size:1.3rem;letter-spacing:-.02em;line-height:1.1;"><?php echo brandWordmark(); ?></div>
 					<div style="font-size:.78rem;color:var(--n-side-mute);margin-top:.1rem;"><?php echo e( $config['tagline'] ); ?></div>
 				</div>
 			</div>
