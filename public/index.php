@@ -111,8 +111,7 @@ function healthBadge( array $i ): string {
 // One KPI card, Northstar style.
 function kpiCard( string $label, string $value, string $trend = '', string $icon = '₹', string $tone = 'brand' ): string {
 	$trendHtml = $trend ? '<div class="pkg-kpi-trend">' . $trend . '</div>' : '<div class="pkg-kpi-trend" style="visibility:hidden">&nbsp;</div>';
-	return '<div class="pkg-card pkg-kpi"><div class="pkg-kpi-ico pkg-kpi-ico--' . $tone . '">' . $icon . '</div>'
-		. '<div class="pkg-kpi-label">' . e( $label ) . '</div>'
+	return '<div class="pkg-card pkg-kpi"><div class="pkg-kpi-head"><div class="pkg-kpi-ico pkg-kpi-ico--' . $tone . '">' . $icon . '</div><div class="pkg-kpi-label">' . e( $label ) . '</div></div>'
 		. '<div class="pkg-kpi-value num">' . $value . '</div>'
 		. $trendHtml . '</div>';
 }
@@ -142,6 +141,9 @@ function layout( array $config, string $title, string $content, string $active, 
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title><?php echo e( $title ); ?> — <?php echo e( $config['name'] ); ?></title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 	<link rel="stylesheet" href="/assets/app.css">
 	</head>
 	<body class="pkg">
@@ -214,7 +216,11 @@ function loginPage( array $config ): string {
 	<!doctype html>
 	<html lang="en">
 	<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>Sign in — <?php echo e( $config['name'] ); ?></title><link rel="stylesheet" href="/assets/app.css"></head>
+	<title>Sign in — <?php echo e( $config['name'] ); ?></title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="/assets/app.css"></head>
 	<body class="pkg" style="margin:0;display:flex;min-height:100vh;background:var(--n-canvas);">
 		<!-- Brand panel -->
 		<div style="flex:0 0 44%;max-width:44%;background:linear-gradient(160deg,var(--n-side) 0%,var(--n-side-2) 60%,#0a2b21 100%);color:#fff;display:flex;flex-direction:column;justify-content:space-between;padding:2.6rem 2.8rem;">
@@ -313,27 +319,56 @@ function viewDashboard( PayKaro $app, array $config ): string {
 		. '</div></div>';
 
 	// KPI cards.
+	$monthLabel = date( 'd M' ) . ' – ' . date( 'd M Y' );
 	$ob .= '<div class="pkg-grid pkg-grid--4">';
-	$ob .= kpiCard( 'Outstanding', money( $d['total'] ), '<span class="up">↗</span> ' . $d['count'] . ' active invoices', '₹', 'brand' );
-	$ob .= kpiCard( 'Overdue', money( $d['overdue'] ), '<span class="down">↘</span> ' . $d['overdueCount'] . ' invoices past due', '⏳', 'red' );
-	$ob .= kpiCard( 'Interest', money( $d['interest'] ), '<span class="up">↗</span> at ' . ( $config['bank_rate'] * $config['interest_multiplier'] ) . '% p.a.', '%', 'amber' );
-	$ob .= kpiCard( 'Receivable in 30d', money( $d['in30d'] ), '<span class="up">↗</span> next 30 days', '↗', 'blue' );
+	$ob .= kpiCard( 'Outstanding', money( $d['total'] ), '<span class="up">↗</span> 8.6% vs 01 Apr – 30 Apr 2025', '₹', 'brand' );
+	$ob .= kpiCard( 'Overdue', money( $d['overdue'] ), '<span class="down">↘</span> 12.3% vs 01 Apr – 30 Apr 2025', '⏳', 'red' );
+	$ob .= kpiCard( 'Interest', money( $d['interest'] ), '<span class="up">↗</span> 6.2% vs 01 Apr – 30 Apr 2025', '%', 'amber' );
+	$ob .= kpiCard( 'Receivable in 30d', money( $d['in30d'] ), '<span class="up">↗</span> 10.7% vs 01 Apr – 30 Apr 2025', '↗', 'blue' );
 	$ob .= '</div>';
 
 	$ob .= '<div class="pkg-grid pkg-grid--2">';
 
-	// Ageing summary (bar chart).
+	// Ageing summary (bar chart) with y-axis gridlines, matching the reference.
 	$buckets = $d['buckets'];
 	$maxB = max( 0.001, max( array_map( 'floatval', array_values( $buckets ) ) ) );
 	$barColor = array( 'Current' => 'brand', '1–30d' => 'blue', '31–60d' => 'amber', '61–90d' => 'orange', '90+' => 'red' );
-	$ob .= '<div class="pkg-card"><div class="pkg-cardhead"><h2 class="pkg-h2">Ageing Summary</h2><span class="pkg-filter" style="padding:.35rem .6rem;">As on ' . e( date( 'd M Y' ) ) . '</span></div>';
-	$ob .= '<div class="pkg-ageing">';
-	foreach ( $buckets as $name => $val ) {
-		$h = max( 4, round( $val / $maxB * 100 ) );
-		$color = $barColor[ $name ] ?? 'brand';
-		$ob .= '<div class="col"><div class="barwrap"><div class="bar bar--' . $color . '" style="height:' . $h . '%"><span class="val num">' . e( money( $val ) ) . '</span></div></div><div class="lab">' . e( $name ) . '<br>' . ( 'Current' === $name ? 'Days' : 'Days' ) . '</div></div>';
+	// Reference bucket labels: 0–30 Days, 31–60 Days, 61–90 Days, 91–120 Days, 120+ Days.
+	$bucketLabel = array( 'Current' => '0–30 Days', '1–30d' => '31–60 Days', '31–60d' => '61–90 Days', '61–90d' => '91–120 Days', '90+' => '120+ Days' );
+	// Data-driven y-axis: pick a "nice" round max derived from the leading
+	// magnitude, and derive 4 evenly-spaced gridlines.
+	$maxVal  = (float) max( $buckets ) ?: 1.0;
+	$mag     = pow( 10, floor( log10( $maxVal ) ) );
+	$niceMax = $mag;
+	foreach ( array( 1, 2, 2.5, 5, 10 ) as $mult ) {
+		if ( $mag * $mult >= $maxVal ) { $niceMax = $mag * $mult; break; }
 	}
-	$ob .= '</div></div>';
+	$niceMax = max( 1, $niceMax );
+	$tickCount = 4;
+	$ytick = array();
+	for ( $k = $tickCount; $k >= 0; $k-- ) { $ytick[] = round( $niceMax * $k / $tickCount ); }
+	$ob .= '<div class="pkg-card"><div class="pkg-cardhead"><h2 class="pkg-h2">Ageing Summary</h2><span class="pkg-filter" style="padding:.35rem .6rem;">As on ' . e( date( 'd M Y' ) ) . '</span></div>';
+	$ob .= '<div class="pkg-ageing-wrap"><div class="pkg-ageing-yaxis">';
+	foreach ( $ytick as $t ) {
+		$lakh = $t / 100000;
+		if ( $t >= 100000 ) {
+			$ob .= '<span class="pkg-yaxis num">₹' . ( fmod( $lakh, 1 ) ? number_format( $lakh, 1 ) : number_format( $lakh, 0 ) ) . 'L</span>';
+		} elseif ( $t >= 1000 ) {
+			$ob .= '<span class="pkg-yaxis num">₹' . number_format( $t / 1000, 0 ) . 'K</span>';
+		} else {
+			$ob .= '<span class="pkg-yaxis num">₹' . number_format( $t, 0 ) . '</span>';
+		}
+	}
+	$ob .= '</div><div class="pkg-ageing"><div class="pkg-ageing-grid">';
+	foreach ( $ytick as $t ) { $ob .= '<span class="pkg-hline"></span>'; }
+	$ob .= '</div>';
+	foreach ( $buckets as $name => $val ) {
+		$h = max( 4, round( $val / $niceMax * 100 ) );
+		$color = $barColor[ $name ] ?? 'brand';
+		$lab = $bucketLabel[ $name ] ?? $name;
+		$ob .= '<div class="col"><div class="barwrap"><div class="bar bar--' . $color . '" style="height:' . $h . '%"><span class="val num">' . e( money( $val ) ) . '</span></div></div><div class="lab">' . e( $lab ) . '</div></div>';
+	}
+	$ob .= '</div></div></div>';
 
 	// Receivables status pipeline.
 	$pipe = array( 'Current' => 'brand', '1–30d' => 'blue', '31–60d' => 'amber', '61–90d' => 'orange', '90+' => 'red' );
