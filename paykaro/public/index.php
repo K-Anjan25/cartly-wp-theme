@@ -83,10 +83,38 @@ function progress( int $score ): string {
 
 function sideIcon( string $key ): string {
 	$i = array(
-		'dashboard' => '▦', 'invoices' => '▤', 'buyers' => '◫',
-		'treds' => '◈', 'reports' => '◧', 'settings' => '⚙',
+		'dashboard' => '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>',
+		'invoices' => '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H7a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7z"/><path d="M14 2v5h5"/><path d="M9 13h6M9 17h6"/></svg>',
+		'buyers' => '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21v-4a4 4 0 0 1 4-4h2a4 4 0 0 1 4 4v4"/><circle cx="9" cy="7" r="3.5"/><path d="M16 11a4 4 0 0 1 4 4v2"/><circle cx="17" cy="6" r="2.6"/></svg>',
+		'treds' => '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2.5"/><path d="M2 10h20"/><path d="M6 14h3M13 14h5"/></svg>',
+		'reports' => '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 20h18"/><path d="M6 16v-5M11 16V8M16 16v-3M21 16V5"/></svg>',
+		'settings' => '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h.09a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v.09a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>',
 	);
 	return $i[ $key ] ?? '•';
+}
+
+// Health-status badge: Paid / Due Soon / Overdue (bucket) — matches the reference table.
+function healthBadge( array $i ): string {
+	if ( 'settled' === $i['status'] ) {
+		return '<span class="pkg-badge pkg-badge--success">Paid</span>';
+	}
+	$d = (int) ( $i['overdue_days'] ?? 0 );
+	if ( $d <= 0 ) {
+		return '<span class="pkg-badge pkg-badge--info">Due Soon</span>';
+	}
+	if ( $d <= 30 )  { return '<span class="pkg-badge pkg-badge--danger">Overdue (1-30)</span>'; }
+	if ( $d <= 60 )  { return '<span class="pkg-badge pkg-badge--danger">Overdue (31-60)</span>'; }
+	if ( $d <= 90 )  { return '<span class="pkg-badge pkg-badge--danger">Overdue (61-90)</span>'; }
+	return '<span class="pkg-badge pkg-badge--danger">Overdue (90+)</span>';
+}
+
+// One KPI card, Northstar style.
+function kpiCard( string $label, string $value, string $trend = '', string $icon = '₹', string $tone = 'brand' ): string {
+	$trendHtml = $trend ? '<div class="pkg-kpi-trend">' . $trend . '</div>' : '<div class="pkg-kpi-trend" style="visibility:hidden">&nbsp;</div>';
+	return '<div class="pkg-card pkg-kpi"><div class="pkg-kpi-ico pkg-kpi-ico--' . $tone . '">' . $icon . '</div>'
+		. '<div class="pkg-kpi-label">' . e( $label ) . '</div>'
+		. '<div class="pkg-kpi-value num">' . $value . '</div>'
+		. $trendHtml . '</div>';
 }
 
 /* ------------------------------------------------------------------ */
@@ -95,15 +123,17 @@ function sideIcon( string $key ): string {
 
 function layout( array $config, string $title, string $content, string $active, array $stats, array $user ): string {
 	$nav = array(
-		'dashboard' => array( '/', 'Dashboard', 'Overview' ),
-		'invoices'  => array( '/invoices', 'Invoices', 'Pipeline' ),
-		'buyers'    => array( '/buyers', 'Buyers', 'Counterparties' ),
-		'treds'     => array( '/treds', 'Finance', 'TReDS & financing' ),
-		'reports'   => array( '/reports', 'Reports', 'Cash-flow' ),
-		'settings'  => array( '/settings', 'Settings', 'Profile' ),
+		'dashboard' => array( '/', 'Overview' ),
+		'invoices'  => array( '/invoices', 'Invoices' ),
+		'buyers'    => array( '/buyers', 'Customers' ),
+		'treds'     => array( '/treds', 'Finance' ),
+		'reports'   => array( '/reports', 'Reports' ),
+		'settings'  => array( '/settings', 'Settings' ),
 	);
 	$b = $config['business'] ?? 'My Business';
 	$initial = strtoupper( substr( ( $user['name'] ?? 'P' ), 0, 1 ) );
+	$role = 'owner';
+	if ( ! empty( $user['role'] ) ) { $role = ucfirst( $user['role'] ); }
 	ob_start();
 	?>
 	<!doctype html>
@@ -126,7 +156,7 @@ function layout( array $config, string $title, string $content, string $active, 
 				</span>
 			</a>
 
-			<div class="pkg-side-label">Workspace</div>
+			<div class="pkg-side-label">Overview</div>
 			<nav class="pkg-side-nav">
 				<?php foreach ( $nav as $key => $n ) : ?>
 					<a class="pkg-side-link <?php echo $active === $key ? 'is-active' : ''; ?>" href="<?php echo $n[0]; ?>">
@@ -136,26 +166,31 @@ function layout( array $config, string $title, string $content, string $active, 
 				<?php endforeach; ?>
 			</nav>
 
-			<div class="pkg-side-foot">
-				<div class="pkg-muted" style="margin-bottom:.4rem;">Signed in as</div>
-				<div style="font-weight:600;color:var(--pk-side-ink);font-size:.85rem;"><?php echo e( $user['name'] ?? '' ); ?></div>
-				<div class="pkg-muted" style="font-size:.72rem;"><?php echo e( $user['email'] ?? '' ); ?></div>
-				<form method="post" action="/logout" style="margin-top:.7rem;"><button class="pkg-btn pkg-btn--sm pkg-btn--ghost" type="submit">Log out</button></form>
+			<div class="pkg-upgrade">
+				<h4>Upgrade to Pro</h4>
+				<p>Unlock advanced reports, automations &amp; more.</p>
+				<button class="pkg-upgrade-btn" type="button">Upgrade Now</button>
+			</div>
+
+			<div class="pkg-side-user">
+				<div class="pkg-avatar"><?php echo e( $initial ); ?></div>
+				<div>
+					<div class="pkg-side-user-name"><?php echo e( $b ); ?></div>
+					<div class="pkg-side-user-role"><?php echo e( $role ); ?></div>
+				</div>
+			</div>
+
+			<form method="post" action="/logout" style="margin:.1rem .5rem;">
+				<button class="pkg-side-collapse" type="submit" style="display:flex;align-items:center;gap:.5rem;border:0;background:none;cursor:pointer;color:var(--n-side-mute);font-size:.74rem;">◂ Log out</button>
+			</form>
+
+			<div class="pkg-side-collapse" style="display:flex;align-items:center;gap:.5rem;">
+				<span style="cursor:pointer" onclick="var d=document.documentElement;d.classList.toggle('dark');try{localStorage.setItem('pk-theme',d.classList.contains('dark')?'dark':'light')}catch(e){}" role="button">◐ Theme</span>
 			</div>
 		</aside>
 
-		<div style="flex:1;min-width:0;display:flex;flex-direction:column;">
-			<header class="pkg-topbar">
-				<div class="pkg-crumbs">Workspace / <strong><?php echo e( ucfirst( $active ) ); ?></strong></div>
-				<div class="pkg-top-search">🔍 <input placeholder="Search invoices, buyers…" aria-label="Search"></div>
-				<div class="pkg-top-actions">
-					<button class="pkg-darkbtn" id="pktheme" type="button" aria-label="Toggle dark mode">◐</button>
-					<div class="pkg-avatar" title="<?php echo e( $user['name'] ?? '' ); ?>"><?php echo e( $initial ); ?></div>
-				</div>
-			</header>
-
+		<div class="pkg-main-wrap">
 			<main class="pkg-main"><?php echo $content; ?></main>
-
 			<footer class="pkg-footer"><?php echo e( $config['name'] ); ?> · <?php echo e( $config['tagline'] ); ?> · demo</footer>
 		</div>
 	</div>
@@ -165,8 +200,6 @@ function layout( array $config, string $title, string $content, string $active, 
 		var root=document.documentElement;
 		function apply(t){root.classList.toggle('dark',t==='dark');}
 		try{var s=localStorage.getItem('pk-theme');apply(s==='dark'||(s!=='light'&&window.matchMedia('(prefers-color-scheme: dark)').matches));}catch(e){}
-		var b=document.getElementById('pktheme');
-		b.addEventListener('click',function(){var n=root.classList.contains('dark')?'light':'dark';apply(n);try{localStorage.setItem('pk-theme',n);}catch(e){}});
 	})();
 	</script>
 	</body>
@@ -248,56 +281,103 @@ function statusTimeline( string $status ): string {
 /* ------------------------------------------------------------------ */
 
 function viewDashboard( PayKaro $app, array $config ): string {
-	$d = $app->dashboard();
-	$ob = '<div class="pkg-card pkg-intro" style="margin-bottom:1.4rem;"><div class="pkg-intro-mark">₹</div><div><div class="pkg-h1">Good morning</div><p>Here is your receivables picture — what’s owed, what’s overdue, and what you could finance today.</p></div></div>';
+	$d       = $app->dashboard();
+	$invoices = $app->invoices();
+	$monthStart = date( 'Y-m-01' );
+	$range = '01 ' . date( 'M' ) . ' – ' . date( 'd M Y' );
+
+	$ob = '<div class="pkg-pagehead">'
+		. '<div><h1 class="pkg-h1">Overview</h1><p class="pkg-sub">Here’s what’s happening with your receivables.</p></div>'
+		. '<div class="pkg-pagehead-actions">'
+		. '<span class="pkg-filter">📅 ' . e( $range ) . '</span>'
+		. '<span class="pkg-filter">⚙ Filters</span>'
+		. '</div></div>';
+
+	// KPI cards.
 	$ob .= '<div class="pkg-grid pkg-grid--4">';
-	$cards = array(
-		array( 'Outstanding', money( $d['total'] ), $d['count'] . ' active invoices', 'pkg-kpi-ico', '₹' ),
-		array( 'Overdue', money( $d['overdue'] ), $d['overdueCount'] . ' invoices past due', 'pkg-kpi-ico--warn', '⏱' ),
-		array( 'Interest accruing', money( $d['interest'] ), 'At ' . ( $config['bank_rate'] * $config['interest_multiplier'] ) . '% p.a.', 'pkg-kpi-ico--danger', '▲' ),
-		array( 'Receivable in 30d', money( $d['in30d'] ), 'Expected inbound cash flow', 'pkg-kpi-ico--accent', '↗' ),
-	);
-	foreach ( $cards as $c ) {
-		$ob .= '<div class="pkg-card pkg-kpi"><span class="pkg-kpi-ico ' . $c[3] . '">' . $c[4] . '</span><div class="pkg-kpi-label">' . e( $c[0] ) . '</div><div class="pkg-kpi-value num">' . $c[1] . '</div><div class="pkg-kpi-sub">' . e( $c[2] ) . '</div></div>';
-	}
+	$ob .= kpiCard( 'Outstanding', money( $d['total'] ), '<span class="up">↗</span> ' . $d['count'] . ' active invoices', '₹', 'brand' );
+	$ob .= kpiCard( 'Overdue', money( $d['overdue'] ), '<span class="down">↘</span> ' . $d['overdueCount'] . ' invoices past due', '⏳', 'red' );
+	$ob .= kpiCard( 'Interest', money( $d['interest'] ), '<span class="up">↗</span> at ' . ( $config['bank_rate'] * $config['interest_multiplier'] ) . '% p.a.', '%', 'amber' );
+	$ob .= kpiCard( 'Receivable in 30d', money( $d['in30d'] ), '<span class="up">↗</span> next 30 days', '↗', 'blue' );
 	$ob .= '</div>';
 
 	$ob .= '<div class="pkg-grid pkg-grid--2">';
-	$ob .= '<div class="pkg-card"><div class="pkg-pagehead" style="margin-bottom:.6rem;"><h2 class="pkg-h2">Ageing</h2><a class="pkg-btn pkg-btn--sm pkg-btn--ghost" href="/reports">Detail →</a></div><div class="pkg-buckets">';
-	$maxB = max( 0.001, max( array_map( 'floatval', array_values( $d['buckets'] ) ) ) );
-	$bcol = array( 'Current' => 'success', '1–30d' => 'info', '31–60d' => 'warning', '61–90d' => 'warning', '90+' => 'danger' );
-	foreach ( $d['buckets'] as $name => $val ) {
-		$pct = round( (float) $val / $maxB * 100 );
-		$ob .= '<div class="pkg-bucket"><div class="pkg-bucket-row"><span class="pkg-bucket-name">' . e( $name ) . '</span><span class="pkg-bucket-value num">' . e( money( $val ) ) . '</span></div>'
-			. '<div class="pkg-bucket-bar"><span class="pkg-bucket-fill pkg-bucket-fill--' . $bcol[ $name ] . '" style="width:' . $pct . '%"></span></div></div>';
+
+	// Ageing summary (bar chart).
+	$buckets = $d['buckets'];
+	$maxB = max( 0.001, max( array_map( 'floatval', array_values( $buckets ) ) ) );
+	$barColor = array( 'Current' => 'brand', '1–30d' => 'blue', '31–60d' => 'amber', '61–90d' => 'orange', '90+' => 'red' );
+	$ob .= '<div class="pkg-card"><div class="pkg-cardhead"><h2 class="pkg-h2">Ageing Summary</h2><span class="pkg-filter" style="padding:.35rem .6rem;">As on ' . e( date( 'd M Y' ) ) . '</span></div>';
+	$ob .= '<div class="pkg-ageing">';
+	foreach ( $buckets as $name => $val ) {
+		$h = max( 4, round( $val / $maxB * 100 ) );
+		$color = $barColor[ $name ] ?? 'brand';
+		$ob .= '<div class="col"><div class="barwrap"><div class="bar bar--' . $color . '" style="height:' . $h . '%"><span class="val num">' . e( money( $val ) ) . '</span></div></div><div class="lab">' . e( $name ) . '<br>' . ( 'Current' === $name ? 'Days' : 'Days' ) . '</div></div>';
 	}
 	$ob .= '</div></div>';
 
-	$ob .= '<div class="pkg-card"><h2 class="pkg-h2">Pipeline</h2><div class="pkg-pipeline">';
-	$statuses = array( 'raised' => 'Raised', 'accepted' => 'Accepted', 'financed' => 'Financed', 'settled' => 'Settled', 'disputed' => 'Disputed' );
-	$colors = array( 'brand', 'info', 'success', 'success', 'danger' );
-	$maxSt = max( 1, max( $d['byStatus'] ?: array( 1 ) ) );
-	$k = 0;
-	foreach ( $statuses as $key => $label ) {
-		$n = $d['byStatus'][ $key ] ?? 0;
-		$pct = round( $n / $maxSt * 100 );
-		$ob .= '<div class="pkg-pipe"><div class="pkg-pipe-bar"><span class="pkg-pipe-fill pkg-bucket-fill--' . $colors[ $k ] . '" style="width:' . $pct . '%"></span></div><div class="pkg-pipe-num num">' . $n . '</div><div class="pkg-pipe-label">' . e( $label ) . '</div></div>';
-		$k++;
+	// Receivables status pipeline.
+	$pipe = array( 'Current' => 'brand', '1–30d' => 'blue', '31–60d' => 'amber', '61–90d' => 'orange', '90+' => 'red' );
+	$counts = array_fill_keys( array_keys( $pipe ), 0 );
+	$sums = array_fill_keys( array_keys( $pipe ), 0.0 );
+	$totalO = 0.0;
+	foreach ( $invoices as $i ) {
+		if ( 'settled' === $i['status'] || 'draft' === $i['status'] ) { continue; }
+		$bal = (float) $i['balance'];
+		$totalO += $bal;
+		$age = $i['ageing'];
+		if ( ! isset( $counts[ $age ] ) ) { $age = 'Current'; }
+		$counts[ $age ]++;
+		$sums[ $age ] += $bal;
 	}
-	$ob .= '</div></div>';
+	$pctBadge = array( 'Current' => 'success', '1–30d' => 'info', '31–60d' => 'warning', '61–90d' => 'warning', '90+' => 'danger' );
+	$ob .= '<div class="pkg-card"><div class="pkg-cardhead"><h2 class="pkg-h2">Receivables Status Pipeline</h2><a class="pkg-btn pkg-btn--sm pkg-btn--ghost" href="/reports">View all →</a></div>';
+	$ob .= '<ul class="pkg-pipe-list">';
+	foreach ( $pipe as $name => $dot ) {
+		$c = $counts[ $name ]; $sum = $sums[ $name ];
+		$pct = $totalO > 0 ? round( $sum / $totalO * 100, 1 ) : 0;
+		$ob .= '<li class="pkg-pipe-row"><span class="pkg-pipe-dot" style="background:var(--n-' . $dot . ');"></span>'
+			. '<span class="pkg-pipe-name">' . e( $name ) . '</span>'
+			. '<span class="pkg-pipe-count">' . $c . ' Invoices</span>'
+			. '<span class="pkg-pipe-right"><span class="pkg-pipe-amt num">' . e( money( $sum ) ) . '</span>'
+			. '<span class="pkg-pipe-pct pkg-badge--' . ( $pctBadge[ $name ] ?? 'neutral' ) . '">' . $pct . '%</span></span></li>';
+	}
+	$ob .= '</ul><div class="pkg-pipe-total"><span>Total</span><span class="num">' . e( money( $totalO ) ) . '</span></div></div>';
 	$ob .= '</div>';
 
-	$alerts = $app->alerts( 6 );
-	if ( $alerts ) {
-		$ob .= '<div class="pkg-card"><h2 class="pkg-h2">Needs attention</h2><ul class="pkg-alerts">';
-		foreach ( $alerts as $a ) {
-			$cls = 'dispute' === $a['type'] ? 'pkg-alert--danger' : ( 'treds' === $a['type'] ? '' : 'pkg-alert--success' );
-			$ob .= '<li class="pkg-alert ' . $cls . '"><span class="pkg-alert-dot"></span><span>' . e( $a['message'] ) . '</span> <span class="pkg-alert-inv">' . e( $a['number'] ?? '' ) . '</span></li>';
+	// Recent invoices table.
+	$rows = array_slice( $invoices, 0, 5 );
+	$ob .= '<div class="pkg-card pkg-tablewrap">';
+	$ob .= '<div class="pkg-cardhead"><h2 class="pkg-h2">Recent Invoices</h2>'
+		. '<div class="pkg-toolbar">'
+		. '<span class="pkg-search">🔍 <input placeholder="Search invoices…" aria-label="Search"></span>'
+		. '<a class="pkg-btn pkg-btn--sm" href="/invoices">Download</a>'
+		. '<a class="pkg-btn pkg-btn--sm pkg-btn--primary" href="/invoices/new">+ New Invoice</a>'
+		. '</div></div>';
+	if ( ! $rows ) {
+		$ob .= '<div class="pkg-empty" style="padding:2.5rem 1rem;"><p class="pkg-sub">No invoices yet.</p><a class="pkg-btn pkg-btn--primary" href="/invoices/new">+ Raise an invoice</a></div>';
+	} else {
+		$ob .= '<table class="pkg-table"><thead><tr><th>Invoice #</th><th>Customer</th><th>Invoice Date</th><th>Due Date</th><th>Amount</th><th>Outstanding</th><th>Status</th><th>Days Overdue</th><th></th></tr></thead><tbody>';
+		foreach ( $rows as $i ) {
+			$ob .= '<tr>'
+				. '<td><a class="pkg-link" href="/invoice?id=' . (int) $i['id'] . '"><strong>' . e( $i['number'] ) . '</strong></a></td>'
+				. '<td>' . e( $i['buyer_name'] ) . '</td>'
+				. '<td>' . e( $i['invoice_date'] ) . '</td>'
+				. '<td>' . e( $i['due_date'] ) . '</td>'
+				. '<td class="num">' . e( money( (float) $i['total_amount'] ) ) . '</td>'
+				. '<td class="num">' . e( money( (float) $i['balance'] ) ) . '</td>'
+				. '<td>' . healthBadge( $i ) . '</td>'
+				. '<td class="num">' . ( (int) $i['overdue_days'] > 0 ? (int) $i['overdue_days'] : '—' ) . '</td>'
+				. '<td><span style="color:var(--n-ink-mute);cursor:pointer;">⋮</span></td>'
+				. '</tr>';
 		}
-		$ob .= '</ul></div>';
-		$app->markAlertsRead();
+		$ob .= '</tbody></table>';
+		$total = count( $invoices );
+		$ob .= '<div class="pkg-pagination"><span>Showing 1 to ' . count( $rows ) . ' of ' . $total . ' Invoices</span>'
+			. '<div class="pkg-pageno"><span class="pkg-pno is-active">1</span><span class="pkg-pno">2</span><span class="pkg-pno">3</span><span class="pkg-pno">…</span><span class="pkg-pno">' . max( 2, ceil( $total / 5 ) ) . '</span></div></div>';
 	}
-	$ob .= '<div class="pkg-row" style="gap:.6rem;"><a class="pkg-btn pkg-btn--primary" href="/invoices/new">+ Raise an invoice</a> <a class="pkg-btn" href="/treds">Open finance queue</a></div>';
+	$ob .= '</div>';
+
 	return $ob;
 }
 
