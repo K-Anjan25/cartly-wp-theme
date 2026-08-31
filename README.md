@@ -1,234 +1,58 @@
-# Cartly — WordPress theme
+# PayKaro — MSME invoice & receivables tracker
 
-The Cartly 2.0 design system as an installable WordPress theme, with first-class
-WooCommerce support.
+**PayKaro** is a workflow tool that turns an invoice into a finance-ready asset.
+It gives India's MSMEs one pipeline to track what's owed, what's overdue, and
+what they could finance today — with the evidence and interest numbers that make
+a delayed-payment or TReDS claim actually stand.
 
-Its sibling is the **platform repo**,
-[`ecommerce-microservices`](https://github.com/K-Anjan25/ecommerce-microservices) — Spring Boot services plus a React
-storefront rendering the same design language from the same tokens. That repo
-holds the canonical design kit
-([`design/`](https://github.com/K-Anjan25/ecommerce-microservices/tree/main/design): tokens, wireframes, palettes) and the
-reasoning behind the two-repo split
-([`docs/09-frontend-strategy.md`](https://github.com/K-Anjan25/ecommerce-microservices/blob/main/docs/09-frontend-strategy.md)).
+This repo is now a **PayKaro-only project**. The former WooCommerce theme and the
+Cartly design-system tooling have been removed; only the application and its docs
+remain.
 
-> **Design tokens are pulled, not authored here.** Run `./bin/sync-tokens.sh`
-> (and `--check` in CI) so the two front ends cannot silently drift.
+## What it does
 
-![Cartly theme](screenshot.png)
+- **One pipeline** for every invoice: `raised → accepted → financed → settled`
+  (or `disputed`), each with a live balance and accruing statutory interest.
+- **Evidence checklist** per invoice (purchase order, delivery ack, goods receipt
+  note, GST-valid copy) so the finance / dispute packet is never missing a document.
+- **TReDS / financing queue** that separates what can be financed today from the
+  gaps holding it back.
+- **Interest & ageing** computed from the invoice (not a spreadsheet), so a claim
+  stands on the correct number.
+- **Guided evidence packet** for an MSEFC / mediation / arbitration claim.
 
----
+## Real auth + multi-tenant isolation
 
-## 1. Install
+- Users, password hashing (`password_hash`), and session tokens.
+- Each user belongs to exactly one **business (tenant)**.
+- Every query is scoped to the user's business (a `tid()` guard), so a user never
+  sees another business's invoices, buyers, payments or disputes.
+- One-click **demo logins** keep the product instantly viewable.
 
-### Option A — upload a zip
+## Stack
 
-```bash
-git clone https://github.com/K-Anjan25/cartly-wp-theme.git cartly
-zip -r cartly.zip cartly \
-  -x 'cartly/.git/*' 'cartly/node_modules/*' 'cartly/assets/src/*' \
-     'cartly/bin/*' 'cartly/ci/*' 'cartly/.github/*'
-```
+- **Backend:** PHP 8.3, PDO (SQLite for the zero-config demo; points at MySQL via
+  `PAYKARO_DB_DSN`).
+- **Frontend:** server-rendered HTML with the self-contained **Northstar** design
+  system (`public/assets/app.css`) — responsive + dark mode.
+- **Bridge (sandbox):** `bridge/serve.mjs` runs the PHP app inside
+  `@php-wasm/node`, translating HTTP ↔ PHP superglobals.
 
-Then **Appearance → Themes → Add New → Upload Theme** and activate.
+## Run
 
-### Option B — copy into the themes folder
+See [`RUN.md`](RUN.md). Demo logins use password `demo1234`.
 
-```bash
-git clone https://github.com/K-Anjan25/cartly-wp-theme.git \
-  /path/to/wp-content/themes/cartly
-```
-
-`assets/css/cartly.css` is committed, so the theme works immediately — you only
-need Node if you intend to change the styles.
-
----
-
-## 2. Requirements
-
-| | |
-|---|---|
-| WordPress | 6.4+ |
-| PHP | 8.0+ |
-| WooCommerce | 8.0+ (optional — the theme degrades to a clean blog/site theme) |
-
----
-
-## 3. First-run setup (5 minutes)
-
-1. **Menus** — *Appearance → Menus*. Locations:
-   - `Primary (header)` — 4 items max; the design is built for four.
-   - `Category rail (storefront)` — optional. Left empty, the rail auto-fills
-     with top-level WooCommerce product categories and their counts.
-   - `Footer column 1/2/3` — the inverse footer's link columns.
-2. **Widgets** — *Appearance → Widgets*:
-   - `Shop sidebar (filters)` — drop WooCommerce *Filter by price / attribute /
-     rating* widgets here. They become the facet column on product archives and
-     a bottom sheet on mobile.
-   - `Blog sidebar` — posts and archives.
-3. **Customizer** — *Appearance → Customize*:
-   - **Announcement bar** — text, a lime highlight phrase, an optional link.
-     Clear the text to hide the bar entirely.
-   - **Storefront hero** — eyebrow, two-line headline (second line renders in
-     Instrument Serif italic lime), copy, two buttons, hero image.
-   - **Footer** — blurb and the comma-separated payment badges.
-4. **Front page** — *Settings → Reading*. Either works:
-   - *Your latest posts* → hero, featured products, new arrivals, journal.
-   - *A static page* → hero, that page's content, then the product sections.
-
----
-
-## 4. What you get
-
-### The shell (wireframe 01 / 06)
-- Dismissible **announcement bar** (session-scoped, like the React app).
-- **Sticky header** with the search promoted to the centre and a `⌘K` / `Ctrl+K`
-  shortcut.
-- **Sticky category rail** under the header on storefront views.
-- **Mobile bottom tab bar** — Shop · Search · Cart · Orders · You, with a live
-  cart badge; the hamburger keeps the long tail.
-- **Inverse ink footer** with link columns and payment badges.
-- **Dark mode**, toggled from the header or the drawer, painted before first
-  paint so there is no light flash.
-
-### Commerce (wireframes 02 / 03 / 07)
-- Product card rebuilt to the design's anatomy: badge stack top-left, stock
-  warning only when it matters, brand eyebrow, two-line name, rating, price row
-  and a docked add-to-cart bar (Woo's AJAX button, restyled — not replaced).
-- Shop archive: hero → trust strip → sticky results toolbar → facet sidebar +
-  4-up grid, with a mobile filter sheet.
-- Single product: buy box wrapper, ink sale badge on the gallery, and the
-  delivery / returns / security trust panel.
-- Styled cart, checkout, order-received and My Account screens.
-
-### Editor
-- `theme.json` exposes the palette, the four type families, the spacing scale
-  and three shadow presets to the block editor, so authored content matches.
-- Editor styles load the same compiled stylesheet.
-
----
-
-## 5. Changing the design
-
-Styles are Tailwind, compiled from `assets/src/`:
-
-```bash
-npm install
-npm run dev      # watch
-npm run build    # minified -> assets/css/cartly.css
-```
-
-- `assets/src/tokens.css` — the colour tokens, `:root` (light) and `.dark`.
-  **Generated from the platform repo, not edited here.** Change
-  `frontend/src/tokens.css` [over there](https://github.com/K-Anjan25/ecommerce-microservices/blob/main/frontend/src/tokens.css),
-  then run `./bin/sync-tokens.sh` and rebuild. CI fails the build if they
-  differ.
-- `assets/src/theme.css` — the component layer plus the WordPress/WooCommerce
-  integration styles.
-- `tailwind.config.js` — mirrors the platform repo's `frontend/tailwind.config.js`.
-
-Two token rules matter:
-
-- **`ink*` is a foreground token.** For a surface that must stay dark in *both*
-  colour schemes use `bg-contrast` + `text-oncontrast` (or `.surface-contrast`),
-  never `bg-ink`.
-- **Prefer `state-*` over raw palettes.** `bg-emerald-50` and friends do not
-  adapt to dark mode; `bg-state-success-soft` does.
-
-If you change `theme.json`'s palette, mirror it in `tokens.css` — WordPress uses
-the former for the editor and the theme uses the latter at runtime.
-
----
-
-## 6. Structure
+## Project layout
 
 ```
-cartly/
-├── style.css                     theme header (+ tiny fallback)
-├── theme.json                    editor palette, type, spacing, shadows
-├── functions.php                 bootstrap
-├── inc/
-│   ├── setup.php                 supports, menus, sidebars, body class, scheme script
-│   ├── enqueue.php               fonts, compiled CSS, theme JS, editor styles
-│   ├── template-tags.php         branding, icons, page header, empty state, pagination
-│   ├── nav-walker.php            pill / chip / drawer / stacked menu walkers
-│   ├── customizer.php            announcement, hero, footer options
-│   └── woocommerce.php           hooks — the bulk of the Woo design work
-├── template-parts/
-│   ├── header/                   announcement · navbar · category-rail · drawer
-│   ├── footer/mobile-tabbar.php
-│   ├── shop/sidebar.php          facets column + mobile sheet
-│   ├── content/card.php          post card
-│   └── hero.php                  the ink storefront hero
-├── woocommerce/                  only the templates worth overriding outright
-│   ├── content-product.php       the product card
-│   ├── loop/no-products-found.php
-│   ├── cart/cart-empty.php
-│   └── global/quantity-input.php
-├── assets/{src,css,js}
-├── bin/                          lint, preview and token-sync tooling
-├── .github/workflows/ci.yml      php -l · lint · build · drift check
-└── screenshot.png
+config.php         business rules, PDO DSN
+db.php             PDO singleton
+schema.sql         businesses, users, sessions, buyers, invoices,
+                   invoice_evidences, payments, financing, disputes, alerts
+PayKaro.php        domain service: auth + tenant scoping + rules
+bin/seed.php       install + idempotent seed (two tenants)
+public/index.php   web router + views (Northstar)
+public/assets/app.css
+bridge/serve.mjs   Node ↔ PHP bridge (sandbox)
+bridge/boot.php    superglobal bootstrap for the bridge
 ```
-
-**Design decision worth knowing:** WooCommerce is styled mostly by *re-hooking*
-(`inc/woocommerce.php`) rather than by copying its templates. Overridden
-templates freeze against the Woo version they were copied from and silently rot;
-hooks survive upgrades. Only four templates are overridden, each with the
-`@version` it was forked at.
-
----
-
-## 7. Preview it without installing anything
-
-`bin/preview.sh` boots a throwaway WordPress with the theme active and a seeded
-demo, using [WordPress Playground](https://wordpress.github.io/wordpress-playground/)
-— PHP and WordPress compiled to WebAssembly. **No PHP, no MySQL, no web server
-required**, just Node.
-
-```bash
-./bin/preview.sh              # WordPress + WooCommerce + demo store
-./bin/preview.sh --no-woo     # theme only; works without network
-PORT=9000 ./bin/preview.sh    # pick a port
-```
-
-Open the printed URL — you are logged in as admin, so the Customizer, menus and
-widget screens are all reachable.
-
-| File | |
-|---|---|
-| `bin/preview.sh` | launcher |
-| `bin/preview-blueprint.json` | Playground blueprint incl. WooCommerce |
-| `bin/preview-blueprint-no-woo.json` | offline fallback |
-| `bin/preview-seed.php` | seeds settings, hero, menus, widgets, categories and content |
-
-The seeder is **preview-only** — it is never loaded by the theme.
-
-## 8. Checks
-
-CI runs `php -l` over every template, the structural linter below, a stylesheet
-build, and the token drift check. Locally, the structural linter needs only
-Python — it understands PHP islands, quoting and heredocs:
-
-```bash
-python3 bin/lint-php.py
-```
-
-It verifies balanced delimiters, matched `if/endif`-style blocks, `ABSPATH`
-guards and the absence of stray closing tags across every template. Before
-shipping to a real site, also run the official tooling:
-
-```bash
-composer global require wp-coding-standards/wpcs
-phpcs --standard=WordPress --ignore=node_modules,assets/css .
-```
-
----
-
-## 9. Not included
-
-This is a **theme**, not a port of the Cartly backend. It renders WooCommerce
-data, not the [Spring Boot services](https://github.com/K-Anjan25/ecommerce-microservices). The features the React storefront gets from
-`commerce-service` — loyalty points, referrals, gift cards, price-drop alerts,
-the returns workflow — would each need a WooCommerce plugin or an integration
-layer against the API gateway. The theme's design language already covers those
-screens (chips, status pills, feature hero), so a plugin can reuse it.
