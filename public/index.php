@@ -109,8 +109,8 @@ function brandWordmark(): string {
 // with a subtle darker-green facet on the lower stem. Sits directly on the
 // dark sidebar (no tile), matching the Northstar reference mark.
 function logoMark( string $class = 'pkg-side-logo' ): string {
-	$green = '#22bb70'; // main green body
-	$deep  = '#159a56';  // deeper green (stem facet)
+	$green = '#1fc9a1'; // bright teal-green body
+	$deep  = '#14a883';  // deeper teal (stem facet)
 	$svg = '<svg width="30" height="30" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">'
 		// Clean rounded "P": round bowl on the right, straight stem; counter is
 		// the rounded hole created by the even-odd subpath.

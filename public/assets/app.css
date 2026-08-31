@@ -72,8 +72,8 @@ html.dark {
 .pkg-side-logo { width:2.05rem; height:2.05rem; display:inline-flex; align-items:center; justify-content:center; background:transparent; flex-shrink:0; }
 .pkg-side-logo svg { display:block; width:100%; height:100%; }
 .pkg-side-brand-name { font-weight:900; font-size:1.12rem; color:#fff; letter-spacing:-.02em; line-height:1.1; }
-.pkg-side-brand-name .pkg-brand-a { color:#fff; }
-.pkg-side-brand-name .pkg-brand-b { color:var(--n-brand); }
+.pkg-brand-a { color:#fff; }
+.pkg-brand-b { color:#1fc9a1; }
 .pkg-side-brand-tag { font-size:.66rem; color:var(--n-side-mute); margin-top:.08rem; letter-spacing:.01em; }
 .pkg-side-label { font-size:.67rem; text-transform:uppercase; letter-spacing:.1em; color:var(--n-side-mute); padding:1rem .7rem .45rem; }
 .pkg-side-nav { display:flex; flex-direction:column; gap:.2rem; }
