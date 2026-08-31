@@ -1,3 +1,7 @@
 node_modules/
 .DS_Store
 *.log
+
+# PayKaro demo database
+*.sqlite
+paykaro/data/*.sqlite
