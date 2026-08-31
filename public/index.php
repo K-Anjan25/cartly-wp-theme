@@ -93,17 +93,22 @@ function sideIcon( string $key ): string {
 	return $i[ $key ] ?? '•';
 }
 
-// PayKaro logo mark: a standalone green geometric "P" glyph (no tile behind it),
-// matching the Northstar reference mark. The counter is a slanted parallelogram
-// so the bowl reads as angular/geometric, not a plain block.
+// PayKaro logo mark: a two-tone, angular geometric "P" with a beveled outline,
+// a dark parallelogram counter (negative space), and a darker-green diagonal
+// facet across the lower stem. Sits directly on the dark sidebar (no tile).
 function logoMark( string $class = 'pkg-side-logo' ): string {
-	$svg = '<svg width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">'
-		// Outer P silhouette (stem + bowl).
-		. '<path fill-rule="evenodd" clip-rule="evenodd" fill="#10b981" d="'
-		. 'M5 2h11.2c4.9 0 8.4 3 8.4 7.5 0 4.5-3.5 7.5-8.4 7.5H10.2V24H5V2zm5.2 4.4v6.2h5.7c2.4 0 3.8-1.3 3.8-3.1 0-1.9-1.4-3.1-3.8-3.1h-5.7z"'
+	$light = '#3ecf8e'; // bright green (main body)
+	$dark  = '#18a05a';  // deeper green (facet)
+	$navy  = '#0e2038';  // counter negative space (matches the dark sidebar)
+	$svg = '<svg width="30" height="30" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">'
+		// Bright-green beveled "P" silhouette.
+		. '<path fill="' . $light . '" d="'
+		. 'M13 6 L31 6 L37 12 L38 19 L32 25 L19 25 L19 34 L14 40 L8 35 L8 13 Z '
 		. '"/>'
-		// Slanted negative-space notch to give the angular counter.
-		. '<path fill="#0c1524" d="M14.2 7.2h5.5l-1.2 2.4h-5.5z" opacity="0"/>'
+		// Dark (negative-space) slanted parallelogram counter.
+		. '<path fill="' . $navy . '" d="M15 10 L30 10 L27 21 L12 21 Z"/>'
+		// Darker-green diagonal facet across the lower stem (the "fold").
+		. '<path fill="' . $dark . '" d="M8 25 L19 22 L19 34 L14 40 L8 35 Z"/>'
 		. '</svg>';
 	return '<span class="' . e( $class ) . '">' . $svg . '</span>';
 }
@@ -242,8 +247,8 @@ function loginPage( array $config ): string {
 			<div style="display:flex;align-items:center;gap:.75rem;">
 				<?php echo logoMark(); ?>
 				<div>
-					<div style="font-weight:800;font-size:1.25rem;letter-spacing:-.02em;"><?php echo e( $config['name'] ); ?></div>
-					<div style="font-size:.78rem;color:var(--n-side-mute);"><?php echo e( $config['tagline'] ); ?></div>
+					<div style="font-weight:900;font-size:1.3rem;letter-spacing:-.02em;line-height:1.1;"><?php echo e( $config['name'] ); ?></div>
+					<div style="font-size:.78rem;color:var(--n-side-mute);margin-top:.1rem;"><?php echo e( $config['tagline'] ); ?></div>
 				</div>
 			</div>
 			<div>
