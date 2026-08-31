@@ -215,30 +215,49 @@ function loginPage( array $config ): string {
 	<html lang="en">
 	<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>Sign in — <?php echo e( $config['name'] ); ?></title><link rel="stylesheet" href="/assets/app.css"></head>
-	<body class="pkg" style="display:flex;align-items:center;justify-content:center;min-height:100vh;">
-		<div class="pkg-card" style="width:100%;max-width:26rem;margin:1rem;padding:2rem;">
-			<div style="display:flex;align-items:center;gap:.7rem;margin-bottom:1rem;">
-				<span class="pkg-side-logo" style="background:linear-gradient(135deg,var(--pk-brand),var(--pk-accent));">₹</span>
-				<div><div class="pkg-h1" style="font-size:1.25rem;"><?php echo e( $config['name'] ); ?></div>
-				<div class="pkg-sub"><?php echo e( $config['tagline'] ); ?></div></div>
-			</div>
-			<p class="pkg-muted" style="margin-bottom:1.2rem;">Sign in to your workspace. Each user sees only their own business's receivables.</p>
-
-			<?php if ( ! empty( $_GET['err'] ) ) : ?><div class="pkg-callout pkg-callout--coral" style="margin-bottom:1rem;">Invalid email or password.</div><?php endif; ?>
-
-			<form method="post" action="/login">
-				<div class="pkg-field"><label class="pkg-label">Email</label><input class="pkg-input" type="email" name="email" required placeholder="you@company.in" autofocus></div>
-				<div class="pkg-field"><label class="pkg-label">Password</label><input class="pkg-input" type="password" name="password" required placeholder="••••••••"></div>
-				<div class="pkg-form-actions"><button class="pkg-btn pkg-btn--primary pkg-btn--block" type="submit">Sign in</button></div>
-			</form>
-
-			<div style="margin-top:1.4rem;border-top:1px dashed var(--pk-line);padding-top:1rem;">
-				<div class="pkg-muted" style="margin-bottom:.6rem;">Demo logins (auto-fill by clicking):</div>
-				<div class="pkg-row" style="gap:.5rem;flex-wrap:wrap;">
-					<a class="pkg-btn pkg-btn--sm" href="/login?demo=1">Sunita · Shree Precision</a>
-					<a class="pkg-btn pkg-btn--sm" href="/login?demo=2">Farhan · MetRow Ceramics</a>
+	<body class="pkg" style="margin:0;display:flex;min-height:100vh;background:var(--n-canvas);">
+		<!-- Brand panel -->
+		<div style="flex:0 0 44%;max-width:44%;background:linear-gradient(160deg,var(--n-side) 0%,var(--n-side-2) 60%,#0a2b21 100%);color:#fff;display:flex;flex-direction:column;justify-content:space-between;padding:2.6rem 2.8rem;">
+			<div style="display:flex;align-items:center;gap:.75rem;">
+				<span class="pkg-side-logo">₹</span>
+				<div>
+					<div style="font-weight:800;font-size:1.25rem;letter-spacing:-.02em;"><?php echo e( $config['name'] ); ?></div>
+					<div style="font-size:.78rem;color:var(--n-side-mute);"><?php echo e( $config['tagline'] ); ?></div>
 				</div>
-				<p class="pkg-muted" style="margin-top:.6rem;font-size:.75rem;">Passwords: <code>demo1234</code></p>
+			</div>
+			<div>
+				<div style="font-size:2rem;font-weight:800;letter-spacing:-.03em;line-height:1.2;margin-bottom:1rem;">Turn invoice mess into<br>finance-ready receivables.</div>
+				<p style="color:var(--n-side-ink);font-size:.92rem;line-height:1.65;max-width:26rem;margin:0;">One pipeline for every invoice — evidence complete, interest computed, and ready to finance or claim the moment it's overdue.</p>
+				<div style="display:flex;gap:.6rem;margin-top:1.6rem;flex-wrap:wrap;">
+					<span style="background:rgba(16,185,129,.14);color:#34d399;border-radius:999px;padding:.35rem .7rem;font-size:.74rem;font-weight:600;">🔒 Multi-tenant secured</span>
+					<span style="background:rgba(148,163,184,.12);color:#cbd5e1;border-radius:999px;padding:.35rem .7rem;font-size:.74rem;font-weight:600;">⚙ TReDS-ready</span>
+				</div>
+			</div>
+			<div style="font-size:.74rem;color:var(--n-side-mute);">&copy; <?php echo e( $config['name'] ); ?> · demo</div>
+		</div>
+
+		<!-- Form panel -->
+		<div style="flex:1;display:flex;align-items:center;justify-content:center;padding:2rem;">
+			<div class="pkg-card" style="width:100%;max-width:24rem;padding:2.2rem;box-shadow:0 20px 48px rgba(16,24,40,.08);">
+				<div class="pkg-h1" style="font-size:1.5rem;">Welcome back</div>
+				<p class="pkg-sub" style="margin:.4rem 0 1.4rem;">Sign in to your workspace. Each user sees only their own business's receivables.</p>
+
+				<?php if ( ! empty( $_GET['err'] ) ) : ?><div class="pkg-callout pkg-callout--coral" style="margin-bottom:1rem;">Invalid email or password.</div><?php endif; ?>
+
+				<form method="post" action="/login">
+					<div class="pkg-field"><label class="pkg-label">Email</label><input class="pkg-input" type="email" name="email" required placeholder="you@company.in" autofocus></div>
+					<div class="pkg-field"><label class="pkg-label">Password</label><input class="pkg-input" type="password" name="password" required placeholder="••••••••"></div>
+					<div class="pkg-form-actions"><button class="pkg-btn pkg-btn--primary pkg-btn--block" type="submit">Sign in</button></div>
+				</form>
+
+				<div style="margin-top:1.5rem;border-top:1px dashed var(--n-line);padding-top:1.1rem;">
+					<div class="pkg-muted" style="margin-bottom:.6rem;">Demo logins (one click):</div>
+					<div style="display:flex;flex-direction:column;gap:.5rem;">
+						<a class="pkg-btn" href="/login?demo=1"><span style="flex:1;text-align:left;">Sunita · Shree Precision</span>→</a>
+						<a class="pkg-btn" href="/login?demo=2"><span style="flex:1;text-align:left;">Farhan · MetRow Ceramics</span>→</a>
+					</div>
+					<p class="pkg-muted" style="margin-top:.7rem;font-size:.74rem;">Passwords: <code style="background:var(--n-paper-2);padding:.1rem .35rem;border-radius:6px;">demo1234</code></p>
+				</div>
 			</div>
 		</div>
 	</body>
@@ -387,7 +406,7 @@ function viewInvoices( PayKaro $app ): string {
 		$f['status'] = $_GET['status'];
 	}
 	$invoices = $app->invoices( $f );
-	$ob = pageHeader( 'Invoices', 'Every invoice, one pipeline.', '<a class="pkg-btn pkg-btn--primary" href="/invoices/new">+ New</a>' );
+	$ob = pageHeader( 'Invoices', 'Every invoice, one pipeline.', '<a class="pkg-btn pkg-btn--primary" href="/invoices/new">+ New Invoice</a>' );
 	$tabs = array( 'all' => 'All', 'raised' => 'Raised', 'accepted' => 'Accepted', 'financed' => 'Financed', 'settled' => 'Settled', 'disputed' => 'Disputed' );
 	$ob .= '<div class="pkg-tabs">';
 	foreach ( $tabs as $key => $label ) {
@@ -398,13 +417,15 @@ function viewInvoices( PayKaro $app ): string {
 	if ( ! $invoices ) {
 		return $ob . '<div class="pkg-card pkg-empty"><h2 class="pkg-h2">No invoices yet</h2><p class="pkg-sub">Raise your first invoice to start tracking receivables.</p><a class="pkg-btn pkg-btn--primary" href="/invoices/new">+ Raise an invoice</a></div>';
 	}
-	$ob .= '<div class="pkg-card pkg-tablewrap"><table class="pkg-table"><thead><tr><th>Invoice</th><th>Buyer</th><th>Due</th><th>Balance</th><th>Ageing</th><th>Status</th><th>TReDS</th><th>Ready</th></tr></thead><tbody>';
+	$ob .= '<div class="pkg-card pkg-tablewrap"><div class="pkg-cardhead"><h2 class="pkg-h2">All invoices</h2><span class="pkg-filter" style="padding:.35rem .6rem;">' . count( $invoices ) . ' results</span></div>'
+		. '<table class="pkg-table"><thead><tr><th>Invoice</th><th>Customer</th><th>Due Date</th><th>Balance</th><th>Ageing</th><th>Status</th><th>Ready</th><th></th></tr></thead><tbody>';
 	foreach ( $invoices as $i ) {
 		$ob .= '<tr><td><a class="pkg-link" href="/invoice?id=' . (int) $i['id'] . '"><strong>' . e( $i['number'] ) . '</strong></a><div class="pkg-muted">' . e( $i['invoice_date'] ) . '</div></td>'
 			. '<td>' . e( $i['buyer_name'] ) . '</td>'
 			. '<td>' . e( $i['due_date'] ) . ( $i['overdue_days'] > 0 ? '<div class="pkg-muted pkg-neg">+' . (int) $i['overdue_days'] . 'd</div>' : '' ) . '</td>'
 			. '<td><strong class="num">' . e( money( $i['balance'] ) ) . '</strong>' . ( $i['interest'] > 0 ? '<div class="pkg-muted pkg-neg">+ ' . e( money( $i['interest'] ) ) . '</div>' : '' ) . '</td>'
-			. '<td>' . e( $i['ageing'] ) . '</td><td>' . badge( $i['status'] ) . '</td><td>' . tredsLabel( $i['treds'] ) . '</td><td>' . progress( (int) $i['readiness'] ) . '</td></tr>';
+			. '<td>' . healthBadge( $i ) . '</td><td>' . badge( $i['status'] ) . '</td><td>' . progress( (int) $i['readiness'] ) . '</td>'
+			. '<td><span style="color:var(--n-ink-mute);cursor:pointer;">⋮</span></td></tr>';
 	}
 	$ob .= '</tbody></table></div>';
 	return $ob;

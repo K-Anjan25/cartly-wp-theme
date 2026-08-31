@@ -257,6 +257,13 @@ html.dark .pkg-badge--warning { color:#f6b449; }
 .pkg-alert--danger .pkg-alert-dot { background:var(--n-red); } .pkg-alert--success .pkg-alert-dot { background:var(--n-brand); }
 .pkg-alert-inv { margin-left:auto; font-family:ui-monospace,monospace; font-size:.75rem; color:var(--n-ink-mute); }
 
+/* ---------- stat list (reports summary) ---------- */
+.pkg-statlist { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:.85rem; }
+.pkg-statlist li { display:flex; justify-content:space-between; align-items:center; font-size:.9rem; padding-bottom:.6rem; border-bottom:1px dashed var(--n-line); }
+.pkg-statlist li:last-child { border-bottom:0; }
+.pkg-statlist span { color:var(--n-ink-soft); }
+.pkg-statlist strong { font-weight:700; }
+
 /* ---------- misc ---------- */
 .pkg-intro { display:flex; gap:1rem; align-items:flex-start; padding:.4rem; }
 .pkg-intro-mark { width:3rem; height:3rem; border-radius:14px; background:var(--n-brand-soft); color:var(--n-brand-strong); display:flex; align-items:center; justify-content:center; font-size:1.4rem; flex-shrink:0; }

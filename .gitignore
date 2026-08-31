@@ -4,4 +4,4 @@ node_modules/
 
 # PayKaro demo database
 *.sqlite
-paykaro/data/*.sqlite
+data/*.sqlite
