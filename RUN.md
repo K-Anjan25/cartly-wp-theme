@@ -11,8 +11,9 @@ From the repo root:
 # Create the DB, seed two demo businesses + users + invoices
 php bin/seed.php
 
-# Serve (any PHP built-in server)
-php -S 0.0.0.0:8080 -t public
+# Serve. `public/router.php` is required: it serves assets off disk and sends
+# every other path to the front controller (so /invoices, /login, ... resolve).
+php -S 0.0.0.0:8080 -t public public/router.php
 ```
 
 Point at MySQL instead of SQLite:
@@ -73,6 +74,7 @@ PayKaro.php        domain service: auth + tenant scoping + rules
 bin/seed.php       install + seed
 public/index.php   web router + views (Northstar)
 public/assets/app.css
+public/router.php  built-in-server router (native mode)
 bridge/serve.mjs   Node ↔ PHP bridge (sandbox)
 bridge/boot.php    superglobal bootstrap for the bridge
 ```

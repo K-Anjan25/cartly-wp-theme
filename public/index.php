@@ -5,10 +5,76 @@
  * Reads $o (method), $g (GET), $p (POST) + the request path, all injected by
  * the bridge. Builds an HTTP response array:
  *   ['status'=>int, 'type'=>mime, 'location'=>?string, 'cookies'=>[[name,value,ttl]], 'body'=>string]
+ *
+ * Two ways to run it:
+ *
+ *  - Through the Node bridge (bridge/serve.mjs), which defines PAYKARO_BRIDGE
+ *    and parses that JSON envelope back into a real HTTP response.
+ *  - Natively, e.g. `php -S 0.0.0.0:8080 -t public public/router.php`. In that
+ *    case the JSON envelope is captured in an output buffer and turned into a
+ *    real HTTP response here (status, Content-Type, Location, Set-Cookie, body)
+ *    so the browser gets HTML instead of raw JSON.
  */
 
 error_reporting( E_ALL );
 ini_set( 'display_errors', '0' );
+
+/*
+ * Native (non-bridge) mode: buffer the JSON envelope the app echoes and emit
+ * it as a real HTTP response at shutdown.
+ */
+if ( ! defined( 'PAYKARO_BRIDGE' ) && ! defined( 'PAYKARO_NATIVE' ) ) {
+	define( 'PAYKARO_NATIVE', true );
+
+	function paykaro_emit_native(): void {
+		$raw = ob_get_level() > 0 ? ob_get_clean() : '';
+		$res = json_decode( (string) $raw, true );
+
+		if ( ! is_array( $res ) || ! isset( $res['body'] ) ) {
+			// Not our envelope (fatal error, stray output, ...): pass it through.
+			if ( ! headers_sent() && '' === trim( (string) $raw ) ) {
+				http_response_code( 500 );
+				header( 'Content-Type: text/plain; charset=utf-8' );
+				echo "PayKaro: the app produced no response.\n";
+				return;
+			}
+			echo $raw;
+			return;
+		}
+
+		if ( ! headers_sent() ) {
+			foreach ( (array) ( $res['cookies'] ?? array() ) as $c ) {
+				$name = (string) ( $c[0] ?? '' );
+				if ( '' === $name ) {
+					continue;
+				}
+				$ttl     = (int) ( $c[2] ?? 0 );
+				$expires = $ttl > 0 ? time() + $ttl : ( '' === (string) ( $c[1] ?? '' ) ? time() - 3600 : 0 );
+				setcookie(
+					$name,
+					(string) ( $c[1] ?? '' ),
+					array(
+						'expires'  => $expires,
+						'path'     => '/',
+						'httponly' => true,
+						'samesite' => 'Lax',
+					)
+				);
+			}
+			if ( ! empty( $res['location'] ) ) {
+				header( 'Location: ' . $res['location'], true, (int) ( $res['status'] ?? 302 ) );
+				return;
+			}
+			http_response_code( (int) ( $res['status'] ?? 200 ) );
+			header( 'Content-Type: ' . ( $res['type'] ?? 'text/html; charset=utf-8' ) );
+		}
+
+		echo (string) $res['body'];
+	}
+
+	ob_start();
+	register_shutdown_function( 'paykaro_emit_native' );
+}
 
 require __DIR__ . '/../config.php';
 require_once __DIR__ . '/../db.php';
