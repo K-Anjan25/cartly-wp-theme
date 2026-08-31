@@ -37,7 +37,7 @@ get_header();
 				<?php
 				cartly_empty_state(
 					__( 'Nothing here yet', 'cartly' ),
-					__( 'There are no posts to show. Try a search, or head back to the shop.', 'cartly' ),
+					__( 'There are no posts to show. Try a search, or head back home.', 'cartly' ),
 					'grid',
 					'<a class="primary-button" href="' . esc_url( home_url( '/' ) ) . '">' . esc_html__( 'Back home', 'cartly' ) . '</a>'
 				);

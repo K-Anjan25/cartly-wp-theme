@@ -27,16 +27,13 @@ defined( 'ABSPATH' ) || exit;
 		<span class="pointer-events-none absolute left-8 top-2.5 text-ink-muted"><?php cartly_icon( 'search', 18 ); ?></span>
 		<label class="screen-reader-text" for="cartly-drawer-search"><?php esc_html_e( 'Search', 'cartly' ); ?></label>
 		<input id="cartly-drawer-search" type="search" name="s" class="input-control pl-10"
-			placeholder="<?php esc_attr_e( 'Search products…', 'cartly' ); ?>">
-		<?php if ( class_exists( 'WooCommerce' ) ) : ?>
-			<input type="hidden" name="post_type" value="product">
-		<?php endif; ?>
+			placeholder="<?php esc_attr_e( 'Search…', 'cartly' ); ?>">
 	</form>
 
 	<nav class="flex-1 overflow-y-auto border-t border-line px-3 py-3" aria-label="<?php esc_attr_e( 'Mobile', 'cartly' ); ?>">
 
 		<?php if ( has_nav_menu( 'primary' ) ) : ?>
-			<p class="eyebrow px-3 pb-2"><?php esc_html_e( 'Shop', 'cartly' ); ?></p>
+			<p class="eyebrow px-3 pb-2"><?php esc_html_e( 'Menu', 'cartly' ); ?></p>
 			<?php
 			wp_nav_menu(
 				array(
@@ -54,27 +51,23 @@ defined( 'ABSPATH' ) || exit;
 		<?php endif; ?>
 
 		<?php
-		if ( taxonomy_exists( 'product_cat' ) ) :
-			$cartly_terms = get_terms(
-				array(
-					'taxonomy'   => 'product_cat',
-					'hide_empty' => true,
-					'number'     => 12,
-					'parent'     => 0,
-				)
-			);
-			if ( ! is_wp_error( $cartly_terms ) && ! empty( $cartly_terms ) ) :
-				?>
-				<p class="eyebrow px-3 pb-2 pt-2"><?php esc_html_e( 'Categories', 'cartly' ); ?></p>
-				<div class="flex flex-wrap gap-2 px-3">
-					<?php foreach ( $cartly_terms as $cartly_term ) : ?>
-						<a href="<?php echo esc_url( get_term_link( $cartly_term ) ); ?>" class="chip">
-							<?php echo esc_html( $cartly_term->name ); ?>
-						</a>
-					<?php endforeach; ?>
-				</div>
-				<?php
-			endif;
+		$cartly_cats = get_categories(
+			array(
+				'hide_empty' => true,
+				'number'     => 12,
+			)
+		);
+		if ( ! empty( $cartly_cats ) && ! is_wp_error( $cartly_cats ) ) :
+			?>
+			<p class="eyebrow px-3 pb-2 pt-2"><?php esc_html_e( 'Categories', 'cartly' ); ?></p>
+			<div class="flex flex-wrap gap-2 px-3">
+				<?php foreach ( $cartly_cats as $cartly_cat ) : ?>
+					<a href="<?php echo esc_url( get_category_link( $cartly_cat ) ); ?>" class="chip">
+						<?php echo esc_html( $cartly_cat->name ); ?>
+					</a>
+				<?php endforeach; ?>
+			</div>
+			<?php
 		endif;
 		?>
 	</nav>
@@ -82,13 +75,8 @@ defined( 'ABSPATH' ) || exit;
 	<div class="space-y-2 border-t border-line p-4">
 		<?php cartly_scheme_toggle( true ); ?>
 
-		<?php if ( class_exists( 'WooCommerce' ) ) : ?>
-			<a href="<?php echo esc_url( wc_get_page_permalink( 'myaccount' ) ); ?>" class="secondary-button w-full">
-				<?php esc_html_e( 'My account', 'cartly' ); ?>
-			</a>
-			<a href="<?php echo esc_url( wc_get_cart_url() ); ?>" class="dark-button w-full">
-				<?php esc_html_e( 'View cart', 'cartly' ); ?>
-			</a>
-		<?php endif; ?>
+		<a href="<?php echo esc_url( cartly_shop_url() ); ?>" class="secondary-button w-full">
+			<?php esc_html_e( 'Read the blog', 'cartly' ); ?>
+		</a>
 	</div>
 </div>

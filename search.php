@@ -49,7 +49,7 @@ $cartly_found = (int) $wp_query->found_posts;
 			__( 'No results', 'cartly' ),
 			__( 'Nothing matched that search. Try a shorter or more general term.', 'cartly' ),
 			'search',
-			'<a class="primary-button" href="' . esc_url( cartly_shop_url() ) . '">' . esc_html__( 'Browse the shop', 'cartly' ) . '</a>'
+			'<a class="primary-button" href="' . esc_url( cartly_shop_url() ) . '">' . esc_html__( 'Browse the blog', 'cartly' ) . '</a>'
 		);
 		?>
 	<?php endif; ?>

@@ -11,13 +11,13 @@ if ( ! get_theme_mod( 'cartly_hero_enabled', true ) ) {
 	return;
 }
 
-$cartly_eyebrow   = get_theme_mod( 'cartly_hero_eyebrow', __( 'New season', 'cartly' ) );
-$cartly_title     = get_theme_mod( 'cartly_hero_title', __( 'Everything you', 'cartly' ) );
-$cartly_title_alt = get_theme_mod( 'cartly_hero_title_alt', __( 'need, one cart.', 'cartly' ) );
-$cartly_text      = get_theme_mod( 'cartly_hero_text', __( 'A catalog you can actually search, a checkout that does not fight you, and rewards that stack.', 'cartly' ) );
-$cartly_cta       = get_theme_mod( 'cartly_hero_cta_label', __( 'Shop the catalog', 'cartly' ) );
+$cartly_eyebrow   = get_theme_mod( 'cartly_hero_eyebrow', __( 'Cartly', 'cartly' ) );
+$cartly_title     = get_theme_mod( 'cartly_hero_title', __( 'Quiet canvas,', 'cartly' ) );
+$cartly_title_alt = get_theme_mod( 'cartly_hero_title_alt', __( 'loud words.', 'cartly' ) );
+$cartly_text      = get_theme_mod( 'cartly_hero_text', __( 'A design system that is easy to read, fast to use and kind to everyone — with an interactive styleguide you can explore in your browser.', 'cartly' ) );
+$cartly_cta       = get_theme_mod( 'cartly_hero_cta_label', __( 'Read the blog', 'cartly' ) );
 $cartly_cta_url   = get_theme_mod( 'cartly_hero_cta_url', '' ) ?: cartly_shop_url();
-$cartly_cta2      = get_theme_mod( 'cartly_hero_cta2_label', __( 'View deals', 'cartly' ) );
+$cartly_cta2      = get_theme_mod( 'cartly_hero_cta2_label', __( 'Open the styleguide', 'cartly' ) );
 $cartly_cta2_url  = get_theme_mod( 'cartly_hero_cta2_url', '' );
 $cartly_image_id  = (int) get_theme_mod( 'cartly_hero_image', 0 );
 ?>
@@ -69,27 +69,27 @@ $cartly_image_id  = (int) get_theme_mod( 'cartly_hero_image', 0 );
 					array( 'class' => 'h-full w-full object-cover' )
 				);
 				?>
-			<?php else : ?>
-				<div class="flex h-full flex-col justify-center gap-4 p-10">
-					<p class="eyebrow"><?php esc_html_e( 'Featured', 'cartly' ); ?></p>
-					<p class="font-heading text-2xl font-bold leading-snug text-ink">
-						<?php esc_html_e( 'Fresh stock lands every week.', 'cartly' ); ?>
-					</p>
-					<p class="text-sm text-ink-soft">
-						<?php esc_html_e( 'Set a hero image in Customizer → Storefront hero.', 'cartly' ); ?>
-					</p>
-				</div>
-			<?php endif; ?>
+		<?php else : ?>
+			<div class="flex h-full flex-col justify-center gap-4 p-10">
+				<p class="eyebrow"><?php esc_html_e( 'Styleguide', 'cartly' ); ?></p>
+				<p class="font-heading text-2xl font-bold leading-snug text-ink">
+					<?php esc_html_e( 'The whole design system, one file.', 'cartly' ); ?>
+				</p>
+				<p class="text-sm text-ink-soft">
+					<?php esc_html_e( 'Run bin/cartly styleguide to generate a live, interactive styleguide.', 'cartly' ); ?>
+				</p>
+			</div>
+		<?php endif; ?>
 		</div>
 	</div>
 
 	<div class="mt-4 grid grid-cols-2 gap-3 lg:grid-cols-4">
 		<?php
 		$cartly_trust = array(
-			array( 'truck', __( 'Free shipping', 'cartly' ), __( 'On qualifying orders', 'cartly' ) ),
-			array( 'refresh', __( '7-day returns', 'cartly' ), __( 'No-questions refunds', 'cartly' ) ),
-			array( 'shield', __( 'Secure checkout', 'cartly' ), __( 'Cards · UPI · COD', 'cartly' ) ),
-			array( 'bolt', __( 'Fast dispatch', 'cartly' ), __( 'Ships within 24h', 'cartly' ) ),
+			array( 'bolt', __( 'Fast & readable', 'cartly' ), __( 'Clear hierarchy, no clutter', 'cartly' ) ),
+			array( 'moon', __( 'Dark mode', 'cartly' ), __( 'First-class, zero flash', 'cartly' ) ),
+			array( 'grid', __( 'Responsive', 'cartly' ), __( 'Phone → desktop', 'cartly' ) ),
+			array( 'shield', __( 'Accessible', 'cartly' ), __( 'WCAG-checked contrast', 'cartly' ) ),
 		);
 
 		foreach ( $cartly_trust as $cartly_item ) :

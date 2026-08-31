@@ -17,11 +17,11 @@ get_header();
 			<?php esc_html_e( 'This page took a wrong turn.', 'cartly' ); ?>
 		</h1>
 		<p class="mx-auto mt-4 max-w-md text-sm text-ink-muted">
-			<?php esc_html_e( 'The link may be old, or the page may have moved. Try a search, or head back to the shop.', 'cartly' ); ?>
+			<?php esc_html_e( 'The link may be old, or the page may have moved. Try a search, or head back home.', 'cartly' ); ?>
 		</p>
 		<div class="mx-auto mt-8 flex max-w-md flex-col justify-center gap-3 sm:flex-row">
 			<a class="accent-button" href="<?php echo esc_url( cartly_shop_url() ); ?>">
-				<?php esc_html_e( 'Back to the shop', 'cartly' ); ?>
+				<?php esc_html_e( 'Browse the blog', 'cartly' ); ?>
 			</a>
 			<a class="inline-flex items-center justify-center gap-2 rounded-sm border border-white/25 px-4 py-2.5 text-sm font-semibold text-oncontrast no-underline transition hover:bg-white/10"
 				href="<?php echo esc_url( home_url( '/' ) ); ?>">

@@ -41,28 +41,13 @@ function cartly_setup() {
 	register_nav_menus(
 		array(
 			'primary'    => __( 'Primary (header)', 'cartly' ),
-			'categories' => __( 'Category rail (storefront)', 'cartly' ),
+			'categories' => __( 'Category rail', 'cartly' ),
 			'footer-1'   => __( 'Footer column 1', 'cartly' ),
 			'footer-2'   => __( 'Footer column 2', 'cartly' ),
 			'footer-3'   => __( 'Footer column 3', 'cartly' ),
 		)
 	);
 
-	// WooCommerce.
-	add_theme_support( 'woocommerce', array(
-		'thumbnail_image_width' => 480,
-		'single_image_width'    => 960,
-		'product_grid'          => array(
-			'default_rows'    => 3,
-			'min_rows'        => 1,
-			'default_columns' => 4,
-			'min_columns'     => 2,
-			'max_columns'     => 4,
-		),
-	) );
-	add_theme_support( 'wc-product-gallery-zoom' );
-	add_theme_support( 'wc-product-gallery-lightbox' );
-	add_theme_support( 'wc-product-gallery-slider' );
 }
 add_action( 'after_setup_theme', 'cartly_setup' );
 
@@ -90,17 +75,6 @@ function cartly_widgets_init() {
 		)
 	);
 
-	register_sidebar(
-		array(
-			'name'          => __( 'Shop sidebar (filters)', 'cartly' ),
-			'id'            => 'shop-sidebar',
-			'description'   => __( 'Facets on product archives. Drop WooCommerce filter widgets here.', 'cartly' ),
-			'before_widget' => '<section id="%1$s" class="widget %2$s">',
-			'after_widget'  => '</section>',
-			'before_title'  => '<h2 class="widget-title">',
-			'after_title'   => '</h2>',
-		)
-	);
 }
 add_action( 'widgets_init', 'cartly_widgets_init' );
 

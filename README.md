@@ -1,234 +1,159 @@
-# Cartly — WordPress theme
+# Cartly DS — design system, in pure PHP
 
-The Cartly 2.0 design system as an installable WordPress theme, with first-class
-WooCommerce support.
+**Cartly DS** turns the Cartly design language into a small, self-contained
+**PHP command-line tool** plus an **interactive, responsive styleguide** — no
+Node, no Tailwind, no Composer, no shell, no Python. One PHP binary owns the
+three jobs that used to be scattered across a fragile toolchain:
 
-Its sibling is the **platform repo**,
-[`ecommerce-microservices`](https://github.com/K-Anjan25/ecommerce-microservices) — Spring Boot services plus a React
-storefront rendering the same design language from the same tokens. That repo
-holds the canonical design kit
-([`design/`](https://github.com/K-Anjan25/ecommerce-microservices/tree/main/design): tokens, wireframes, palettes) and the
-reasoning behind the two-repo split
-([`docs/09-frontend-strategy.md`](https://github.com/K-Anjan25/ecommerce-microservices/blob/main/docs/09-frontend-strategy.md)).
+1. **Compile** the design tokens + components into a single distributable CSS
+   file.
+2. **Render** an interactive, responsive styleguide (live dark mode, searchable
+   token browser, WCAG contrast checker, component library) as one self-contained
+   HTML file.
+3. **Guard** against token drift, so the WordPress theme and the React storefront
+   cannot silently diverge.
 
-> **Design tokens are pulled, not authored here.** Run `./bin/sync-tokens.sh`
-> (and `--check` in CI) so the two front ends cannot silently drift.
-
-![Cartly theme](screenshot.png)
-
----
-
-## 1. Install
-
-### Option A — upload a zip
-
-```bash
-git clone https://github.com/K-Anjan25/cartly-wp-theme.git cartly
-zip -r cartly.zip cartly \
-  -x 'cartly/.git/*' 'cartly/node_modules/*' 'cartly/assets/src/*' \
-     'cartly/bin/*' 'cartly/ci/*' 'cartly/.github/*'
-```
-
-Then **Appearance → Themes → Add New → Upload Theme** and activate.
-
-### Option B — copy into the themes folder
-
-```bash
-git clone https://github.com/K-Anjan25/cartly-wp-theme.git \
-  /path/to/wp-content/themes/cartly
-```
-
-`assets/css/cartly.css` is committed, so the theme works immediately — you only
-need Node if you intend to change the styles.
+> This repo was a WooCommerce theme. The commerce layer is gone. What remains is
+> the durable asset — the design system — made into a tool anyone can run.
 
 ---
 
-## 2. Requirements
+## Why
+
+The Cartly design language lives in *one* place — `assets/src/tokens.css` — but
+is consumed by *two* front ends (this repo's WordPress theme and the React
+storefront in
+[`ecommerce-microservices`](https://github.com/K-Anjan25/ecommerce-microservices)).
+The old way of keeping them in step needed **Node + Tailwind + bash + Python + a
+CI job**, and it was brittle (the previous commit was literally a Git-Bash fix).
+
+**Cartly DS** replaces all of that with one command you run with `php`.
+
+---
+
+## Requirements
 
 | | |
 |---|---|
-| WordPress | 6.4+ |
-| PHP | 8.0+ |
-| WooCommerce | 8.0+ (optional — the theme degrades to a clean blog/site theme) |
+| PHP | 7.4+ (CLI) |
+| Node / npm / Tailwind | none |
+| Composer / extensions | none |
 
 ---
 
-## 3. First-run setup (5 minutes)
-
-1. **Menus** — *Appearance → Menus*. Locations:
-   - `Primary (header)` — 4 items max; the design is built for four.
-   - `Category rail (storefront)` — optional. Left empty, the rail auto-fills
-     with top-level WooCommerce product categories and their counts.
-   - `Footer column 1/2/3` — the inverse footer's link columns.
-2. **Widgets** — *Appearance → Widgets*:
-   - `Shop sidebar (filters)` — drop WooCommerce *Filter by price / attribute /
-     rating* widgets here. They become the facet column on product archives and
-     a bottom sheet on mobile.
-   - `Blog sidebar` — posts and archives.
-3. **Customizer** — *Appearance → Customize*:
-   - **Announcement bar** — text, a lime highlight phrase, an optional link.
-     Clear the text to hide the bar entirely.
-   - **Storefront hero** — eyebrow, two-line headline (second line renders in
-     Instrument Serif italic lime), copy, two buttons, hero image.
-   - **Footer** — blurb and the comma-separated payment badges.
-4. **Front page** — *Settings → Reading*. Either works:
-   - *Your latest posts* → hero, featured products, new arrivals, journal.
-   - *A static page* → hero, that page's content, then the product sections.
-
----
-
-## 4. What you get
-
-### The shell (wireframe 01 / 06)
-- Dismissible **announcement bar** (session-scoped, like the React app).
-- **Sticky header** with the search promoted to the centre and a `⌘K` / `Ctrl+K`
-  shortcut.
-- **Sticky category rail** under the header on storefront views.
-- **Mobile bottom tab bar** — Shop · Search · Cart · Orders · You, with a live
-  cart badge; the hamburger keeps the long tail.
-- **Inverse ink footer** with link columns and payment badges.
-- **Dark mode**, toggled from the header or the drawer, painted before first
-  paint so there is no light flash.
-
-### Commerce (wireframes 02 / 03 / 07)
-- Product card rebuilt to the design's anatomy: badge stack top-left, stock
-  warning only when it matters, brand eyebrow, two-line name, rating, price row
-  and a docked add-to-cart bar (Woo's AJAX button, restyled — not replaced).
-- Shop archive: hero → trust strip → sticky results toolbar → facet sidebar +
-  4-up grid, with a mobile filter sheet.
-- Single product: buy box wrapper, ink sale badge on the gallery, and the
-  delivery / returns / security trust panel.
-- Styled cart, checkout, order-received and My Account screens.
-
-### Editor
-- `theme.json` exposes the palette, the four type families, the spacing scale
-  and three shadow presets to the block editor, so authored content matches.
-- Editor styles load the same compiled stylesheet.
-
----
-
-## 5. Changing the design
-
-Styles are Tailwind, compiled from `assets/src/`:
+## The tool
 
 ```bash
-npm install
-npm run dev      # watch
-npm run build    # minified -> assets/css/cartly.css
+php bin/cartly --version      # Cartly DS 1.0.0
+php bin/cartly help           # usage
+
+php bin/cartly tokens         # dump the design tokens as a table
+php bin/cartly tokens --json  # ... or as JSON (light, dark, raw)
+
+php bin/cartly css            # compile tokens + components -> dist/cartly.css
+php bin/cartly css --minify   # minified
+php bin/cartly css --out path/to/file.css
+
+php bin/cartly styleguide     # render an interactive styleguide -> dist/styleguide.html
+
+php bin/cartly check          # token-drift guard; non-zero exit on drift
+php bin/cartly check --baseline design/tokens.json
+
+php bin/cartly build --out dist   # css + styleguide together
 ```
 
-- `assets/src/tokens.css` — the colour tokens, `:root` (light) and `.dark`.
-  **Generated from the platform repo, not edited here.** Change
-  `frontend/src/tokens.css` [over there](https://github.com/K-Anjan25/ecommerce-microservices/blob/main/frontend/src/tokens.css),
-  then run `./bin/sync-tokens.sh` and rebuild. CI fails the build if they
-  differ.
-- `assets/src/theme.css` — the component layer plus the WordPress/WooCommerce
-  integration styles.
-- `tailwind.config.js` — mirrors the platform repo's `frontend/tailwind.config.js`.
+Every command reads the canonical `assets/src/tokens.css` and compiles it with
+`src/CartlyDS/`. Because the tool is pure PHP, you can drop `bin/cartly` and
+`src/` into *any* project (the WordPress theme or the React storefront) and run
+the same build with the same output.
 
-Two token rules matter:
+### The commands in detail
 
-- **`ink*` is a foreground token.** For a surface that must stay dark in *both*
-  colour schemes use `bg-contrast` + `text-oncontrast` (or `.surface-contrast`),
-  never `bg-ink`.
-- **Prefer `state-*` over raw palettes.** `bg-emerald-50` and friends do not
-  adapt to dark mode; `bg-state-success-soft` does.
-
-If you change `theme.json`'s palette, mirror it in `tokens.css` — WordPress uses
-the former for the editor and the theme uses the latter at runtime.
+- **`tokens`** — parses `tokens.css`, splits light/dark, computes hex, groups
+  tokens by role (brand, accent, neutral, contrast, state), and can export JSON.
+- **`css`** — re-emits a clean `:root` + `.dark` block from the parsed tokens,
+  then appends the component layer (`assets/src/components.css`) to produce one
+  distributable stylesheet. This is a drop-in for the old Tailwind build.
+- **`styleguide`** — renders a single, self-contained HTML page:
+  - a **dark-mode toggle** (persisted, no flash),
+  - a **searchable token browser** grouped by role, with copy-to-clipboard and
+    light/dark values,
+  - a **verified contrast-pairs table** using WCAG 2.x,
+  - an **interactive contrast checker** (pick foreground/background),
+  - the **type scale** and a **component library** (buttons, chips, badges,
+    surfaces, the product card anatomy).
+- **`check`** — compares the local tokens against a baseline (a JSON dump or
+  another `tokens.css`) and returns a non-zero exit code on drift, so it drops
+  straight into CI.
 
 ---
 
-## 6. Structure
+## Run them for real
 
-```
-cartly/
-├── style.css                     theme header (+ tiny fallback)
-├── theme.json                    editor palette, type, spacing, shadows
-├── functions.php                 bootstrap
-├── inc/
-│   ├── setup.php                 supports, menus, sidebars, body class, scheme script
-│   ├── enqueue.php               fonts, compiled CSS, theme JS, editor styles
-│   ├── template-tags.php         branding, icons, page header, empty state, pagination
-│   ├── nav-walker.php            pill / chip / drawer / stacked menu walkers
-│   ├── customizer.php            announcement, hero, footer options
-│   └── woocommerce.php           hooks — the bulk of the Woo design work
-├── template-parts/
-│   ├── header/                   announcement · navbar · category-rail · drawer
-│   ├── footer/mobile-tabbar.php
-│   ├── shop/sidebar.php          facets column + mobile sheet
-│   ├── content/card.php          post card
-│   └── hero.php                  the ink storefront hero
-├── woocommerce/                  only the templates worth overriding outright
-│   ├── content-product.php       the product card
-│   ├── loop/no-products-found.php
-│   ├── cart/cart-empty.php
-│   └── global/quantity-input.php
-├── assets/{src,css,js}
-├── bin/                          lint, preview and token-sync tooling
-├── .github/workflows/ci.yml      php -l · lint · build · drift check
-└── screenshot.png
+```bash
+php bin/cartly build --out dist
+
+open dist/styleguide.html   # the interactive styleguide
 ```
 
-**Design decision worth knowing:** WooCommerce is styled mostly by *re-hooking*
-(`inc/woocommerce.php`) rather than by copying its templates. Overridden
-templates freeze against the Woo version they were copied from and silently rot;
-hooks survive upgrades. Only four templates are overridden, each with the
-`@version` it was forked at.
+`dist/styleguide.html` is fully self-contained (no network, no build step) — you
+can email it or drop it on any static host.
 
 ---
 
-## 7. Preview it without installing anything
+## Source layout
 
-`bin/preview.sh` boots a throwaway WordPress with the theme active and a seeded
-demo, using [WordPress Playground](https://wordpress.github.io/wordpress-playground/)
-— PHP and WordPress compiled to WebAssembly. **No PHP, no MySQL, no web server
-required**, just Node.
-
-```bash
-./bin/preview.sh              # WordPress + WooCommerce + demo store
-./bin/preview.sh --no-woo     # theme only; works without network
-PORT=9000 ./bin/preview.sh    # pick a port
 ```
-
-Open the printed URL — you are logged in as admin, so the Customizer, menus and
-widget screens are all reachable.
-
-| File | |
-|---|---|
-| `bin/preview.sh` | launcher |
-| `bin/preview-blueprint.json` | Playground blueprint incl. WooCommerce |
-| `bin/preview-blueprint-no-woo.json` | offline fallback |
-| `bin/preview-seed.php` | seeds settings, hero, menus, widgets, categories and content |
-
-The seeder is **preview-only** — it is never loaded by the theme.
-
-## 8. Checks
-
-CI runs `php -l` over every template, the structural linter below, a stylesheet
-build, and the token drift check. Locally, the structural linter needs only
-Python — it understands PHP islands, quoting and heredocs:
-
-```bash
-python3 bin/lint-php.py
-```
-
-It verifies balanced delimiters, matched `if/endif`-style blocks, `ABSPATH`
-guards and the absence of stray closing tags across every template. Before
-shipping to a real site, also run the official tooling:
-
-```bash
-composer global require wp-coding-standards/wpcs
-phpcs --standard=WordPress --ignore=node_modules,assets/css .
+bin/cartly                     the CLI + tiny autoloader
+src/CartlyDS/Tokens.php        token model: parse, hex, WCAG contrast, grouping
+src/CartlyDS/Compiler.php      tokens -> stylesheet (:root + .dark + components)
+src/CartlyDS/Styleguide.php    tokens + css -> self-contained HTML styleguide
+src/CartlyDS/Drift.php         compare two token sets, render a diff table
+assets/src/tokens.css          THE canonical design tokens (light + dark)
+assets/src/components.css      pure-CSS component layer (no @apply, no Tailwind)
+design/tokens.json             the committed token baseline for `check`
+dist/                          generated: cartly.css + styleguide.html
 ```
 
 ---
 
-## 9. Not included
+## Theme (still here, now WooCommerce-free)
 
-This is a **theme**, not a port of the Cartly backend. It renders WooCommerce
-data, not the [Spring Boot services](https://github.com/K-Anjan25/ecommerce-microservices). The features the React storefront gets from
-`commerce-service` — loyalty points, referrals, gift cards, price-drop alerts,
-the returns workflow — would each need a WooCommerce plugin or an integration
-layer against the API gateway. The theme's design language already covers those
-screens (chips, status pills, feature hero), so a plugin can reuse it.
+The WordPress theme remains, but it is **no longer an e-commerce theme**. The
+WooCommerce integration, product templates, cart/checkout styling and shop
+tooling have all been removed. It now renders a clean blog/site theme using the
+same design tokens, and it keeps a deliberately dark *contrast* hero, an inverse
+footer, a mobile bottom tab bar and first-class dark mode.
+
+The theme loads its compiled stylesheet from `assets/css/cartly.css`. If you
+want to change the design language, edit `assets/src/tokens.css` and regenerate
+the standalone stylesheet:
+
+```bash
+php bin/cartly css --out assets/css/cartly.css
+```
+
+---
+
+## Checks / CI
+
+The bundled CI (`.github/workflows/ci.yml`) needs only PHP:
+
+```bash
+find . -name '*.php' -not -path './node_modules/*' -print0 | xargs -0 -n1 php -l
+php bin/cartly build --out dist
+php bin/cartly check --baseline design/tokens.json
+```
+
+It lint-checks every PHP file, builds the CSS + styleguide, runs the drift
+guard, and fails if the committed `dist/` artefacts are stale.
+
+---
+
+## Notes
+
+- `assets/src/tokens.css` is the **single source of truth** for the palette; do
+  not hand-edit `dist/` output.
+- `color-scheme` is set per scheme so the browser paints the correct scrollbars
+  and form controls automatically.
+- The tool has **no external dependencies** — it uses only core PHP functions.

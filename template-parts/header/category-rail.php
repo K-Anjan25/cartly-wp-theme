@@ -1,15 +1,14 @@
 <?php
 /**
  * Persistent category rail — one tap instead of a dropdown.
- * Uses the `categories` menu if set, otherwise WooCommerce product categories.
+ * Uses the `categories` menu if set, otherwise blog categories.
  *
  * @package Cartly
  */
 
 defined( 'ABSPATH' ) || exit;
 
-$cartly_show_rail = is_front_page() || is_home() || is_search()
-	|| ( function_exists( 'is_shop' ) && ( is_shop() || is_product_category() || is_product_tag() ) );
+$cartly_show_rail = is_front_page() || is_home() || is_search();
 
 /**
  * Filter whether the category rail renders on the current view.
@@ -42,24 +41,18 @@ if ( has_nav_menu( 'categories' ) ) :
 	return;
 endif;
 
-if ( ! taxonomy_exists( 'product_cat' ) ) {
-	return;
-}
-
-$cartly_terms = get_terms(
+$cartly_terms = get_categories(
 	array(
-		'taxonomy'   => 'product_cat',
 		'hide_empty' => true,
 		'number'     => 12,
-		'parent'     => 0,
 	)
 );
 
-if ( is_wp_error( $cartly_terms ) || empty( $cartly_terms ) ) {
+if ( empty( $cartly_terms ) || is_wp_error( $cartly_terms ) ) {
 	return;
 }
 
-$cartly_current = ( is_product_category() && is_object( get_queried_object() ) ) ? get_queried_object_id() : 0;
+$cartly_current = ( is_category() && is_object( get_queried_object() ) ) ? get_queried_object_id() : 0;
 ?>
 <div class="sticky top-16 z-40 border-b border-line bg-paper/85 backdrop-blur-md">
 	<div class="page-shell no-scrollbar flex h-12 items-center gap-2 overflow-x-auto">
@@ -72,7 +65,7 @@ $cartly_current = ( is_product_category() && is_object( get_queried_object() ) )
 			</li>
 			<?php foreach ( $cartly_terms as $cartly_term ) : ?>
 				<li class="list-none">
-					<a href="<?php echo esc_url( get_term_link( $cartly_term ) ); ?>"
+					<a href="<?php echo esc_url( get_category_link( $cartly_term ) ); ?>"
 						class="chip <?php echo ( $cartly_current === $cartly_term->term_id ) ? 'chip-ink' : ''; ?>">
 						<?php echo esc_html( $cartly_term->name ); ?>
 						<span class="<?php echo ( $cartly_current === $cartly_term->term_id ) ? 'text-oncontrast/60' : 'text-ink-muted'; ?>">

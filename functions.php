@@ -16,7 +16,3 @@ require_once CARTLY_DIR . '/inc/enqueue.php';
 require_once CARTLY_DIR . '/inc/template-tags.php';
 require_once CARTLY_DIR . '/inc/nav-walker.php';
 require_once CARTLY_DIR . '/inc/customizer.php';
-
-if ( class_exists( 'WooCommerce' ) ) {
-	require_once CARTLY_DIR . '/inc/woocommerce.php';
-}

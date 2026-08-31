@@ -205,102 +205,45 @@ function cartly_scheme_toggle( $with_label = false ) {
 }
 
 /**
- * Cart item count (0 when WooCommerce is not active).
- *
- * @return int
- */
-function cartly_cart_count() {
-	if ( ! function_exists( 'WC' ) || ! WC()->cart ) {
-		return 0;
-	}
-	return (int) WC()->cart->get_cart_contents_count();
-}
-
-/**
- * Shop URL, falling back to the posts page.
+ * Blog/archive URL, pointing at the posts page (or home).
  *
  * @return string
  */
 function cartly_shop_url() {
-	if ( function_exists( 'wc_get_page_permalink' ) ) {
-		$url = wc_get_page_permalink( 'shop' );
-		if ( $url ) {
-			return $url;
-		}
+	$posts = get_option( 'page_for_posts' );
+	if ( $posts ) {
+		return get_permalink( $posts );
 	}
 	return home_url( '/' );
 }
 
 /**
- * Featured + latest products on the front page.
- * No-ops silently when WooCommerce is not installed.
+ * Latest posts as a card grid, for the front page / archives.
+ *
+ * @param int $count How many posts to show.
+ * @return void
  */
-function cartly_front_page_products() {
-	if ( ! class_exists( 'WooCommerce' ) || ! function_exists( 'wc_get_products' ) ) {
-		return;
-	}
-
-	$sections = array(
+function cartly_recent_posts( int $count = 4 ): void {
+	$query = new WP_Query(
 		array(
-			'eyebrow' => __( 'Popular right now', 'cartly' ),
-			'title'   => __( 'Featured', 'cartly' ),
-			'args'    => array( 'featured' => true ),
-		),
-		array(
-			'eyebrow' => __( 'Just landed', 'cartly' ),
-			'title'   => __( 'New arrivals', 'cartly' ),
-			'args'    => array(),
-		),
+			'posts_per_page'      => $count,
+			'post_status'         => 'publish',
+			'ignore_sticky_posts' => true,
+		)
 	);
 
-	foreach ( $sections as $section ) {
-		$products = wc_get_products(
-			array_merge(
-				array(
-					'status'  => 'publish',
-					'limit'   => 4,
-					'orderby' => 'date',
-					'order'   => 'DESC',
-					'visibility' => 'catalog',
-				),
-				$section['args']
-			)
-		);
-
-		if ( empty( $products ) ) {
-			continue;
-		}
-		?>
-		<section class="page-shell mt-12">
-			<div class="mb-5 flex items-end justify-between gap-4">
-				<div>
-					<p class="eyebrow"><?php echo esc_html( $section['eyebrow'] ); ?></p>
-					<h2 class="section-title mt-1"><?php echo esc_html( $section['title'] ); ?></h2>
-				</div>
-				<a href="<?php echo esc_url( cartly_shop_url() ); ?>" class="text-sm font-semibold text-brand no-underline hover:underline">
-					<?php esc_html_e( 'See all →', 'cartly' ); ?>
-				</a>
-			</div>
-
-			<ul class="product-grid products">
-				<?php
-				global $product, $post;
-				$cartly_prev_product = $product;
-				$cartly_prev_post    = $post;
-
-				foreach ( $products as $cartly_wc_product ) {
-					$post    = get_post( $cartly_wc_product->get_id() ); // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
-					$product = $cartly_wc_product;                       // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
-					setup_postdata( $post );
-					wc_get_template_part( 'content', 'product' );
-				}
-
-				$product = $cartly_prev_product; // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
-				$post    = $cartly_prev_post;    // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
-				wp_reset_postdata();
-				?>
-			</ul>
-		</section>
-		<?php
+	if ( ! $query->have_posts() ) {
+		return;
 	}
+	?>
+	<ul class="grid grid-cols-2 gap-3 sm:gap-5 md:grid-cols-3 xl:grid-cols-4">
+		<?php
+		while ( $query->have_posts() ) {
+			$query->the_post();
+			get_template_part( 'template-parts/content/card' );
+		}
+		wp_reset_postdata();
+		?>
+	</ul>
+	<?php
 }

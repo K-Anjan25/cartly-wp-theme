@@ -1,6 +1,6 @@
 <?php
 /**
- * Front page: hero + latest products (or latest posts without WooCommerce).
+ * Front page: hero + latest posts.
  *
  * @package Cartly
  */
@@ -23,14 +23,12 @@ if ( 'page' === get_option( 'show_on_front' ) && get_option( 'page_on_front' ) )
 		endif;
 	endwhile;
 
-	cartly_front_page_products();
 	get_footer();
 	return;
 }
 
 get_header();
 get_template_part( 'template-parts/hero' );
-cartly_front_page_products();
 ?>
 
 <?php if ( have_posts() ) : ?>
