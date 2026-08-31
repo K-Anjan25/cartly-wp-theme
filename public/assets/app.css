@@ -69,7 +69,8 @@ html.dark {
 /* ---------- sidebar ---------- */
 .pkg-side { width:16.5rem; flex-shrink:0; background:var(--n-side); color:var(--n-side-ink); display:flex; flex-direction:column; position:sticky; top:0; height:100vh; padding:1.3rem 1rem 1rem; }
 .pkg-side-brand { display:flex; align-items:center; gap:.7rem; padding:.1rem .5rem 1.05rem; }
-.pkg-side-logo { width:2.25rem; height:2.25rem; border-radius:11px; display:flex; align-items:center; justify-content:center; background:linear-gradient(135deg,var(--n-brand),#0ea5a0); color:#fff; font-weight:800; font-size:1.08rem; box-shadow:0 6px 16px rgba(16,185,129,.35); }
+.pkg-side-logo { width:2.05rem; height:2.05rem; display:inline-flex; align-items:center; justify-content:center; background:transparent; flex-shrink:0; }
+.pkg-side-logo svg { display:block; width:100%; height:100%; }
 .pkg-side-brand-name { font-weight:800; font-size:1.08rem; color:#fff; letter-spacing:-.01em; }
 .pkg-side-brand-tag { font-size:.66rem; color:var(--n-side-mute); margin-top:.05rem; }
 .pkg-side-label { font-size:.67rem; text-transform:uppercase; letter-spacing:.1em; color:var(--n-side-mute); padding:1rem .7rem .45rem; }

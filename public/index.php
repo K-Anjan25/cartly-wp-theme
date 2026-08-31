@@ -93,14 +93,17 @@ function sideIcon( string $key ): string {
 	return $i[ $key ] ?? '•';
 }
 
-// PayKaro logo mark: a rounded tile with a stylised "P" (the brand glyph).
+// PayKaro logo mark: a standalone green geometric "P" glyph (no tile behind it),
+// matching the Northstar reference mark. The counter is a slanted parallelogram
+// so the bowl reads as angular/geometric, not a plain block.
 function logoMark( string $class = 'pkg-side-logo' ): string {
-	// Stylised "P": a vertical stem + a rounded bowl, with a small leaf accent
-	// on the counter, matching the Northstar reference mark.
-	$svg = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">'
-		. '<path d="M9 4h5.2c3 0 5.3 2.1 5.3 5s-2.3 5-5.3 5H12v4H9V4z" fill="#fff"/>'
-		. '<path d="M12 7h2.4a2 2 0 0 1 0 4H12V7z" fill="#10b981"/>'
-		. '<circle cx="16.6" cy="18.4" r="1.6" fill="#22c39a"/>'
+	$svg = '<svg width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">'
+		// Outer P silhouette (stem + bowl).
+		. '<path fill-rule="evenodd" clip-rule="evenodd" fill="#10b981" d="'
+		. 'M5 2h11.2c4.9 0 8.4 3 8.4 7.5 0 4.5-3.5 7.5-8.4 7.5H10.2V24H5V2zm5.2 4.4v6.2h5.7c2.4 0 3.8-1.3 3.8-3.1 0-1.9-1.4-3.1-3.8-3.1h-5.7z"'
+		. '"/>'
+		// Slanted negative-space notch to give the angular counter.
+		. '<path fill="#0c1524" d="M14.2 7.2h5.5l-1.2 2.4h-5.5z" opacity="0"/>'
 		. '</svg>';
 	return '<span class="' . e( $class ) . '">' . $svg . '</span>';
 }
