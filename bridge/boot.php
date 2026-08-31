@@ -12,6 +12,10 @@
 error_reporting( 0 );
 ini_set( 'display_errors', '0' );
 
+// Tells public/index.php that serve.mjs will turn its JSON envelope into HTTP,
+// so it must not emit headers/body itself.
+define( 'PAYKARO_BRIDGE', true );
+
 $raw = isset( $argv[1] ) ? $argv[1] : '';
 $ctx = json_decode( (string) $raw, true );
 $ctx = is_array( $ctx ) ? $ctx : array();
