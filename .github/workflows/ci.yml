@@ -1,17 +1,12 @@
-# Copy this file to .github/workflows/ci.yml in the standalone theme repo.
-#
-# It is parked here (not under .github/) because in the monorepo this directory
-# is not a workflow root, and the monorepo's push token cannot write workflows.
-#
 name: CI
 
 on:
   push:
-    branches: [main]
+    branches: [main, "arena/**"]
   pull_request:
 
 jobs:
-  theme:
+  lint:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -19,42 +14,34 @@ jobs:
       - name: Set up PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.2'
-          tools: composer
+          php-version: '8.3'
 
       - name: Lint every PHP file
         run: |
-          find . -name '*.php' -not -path './node_modules/*' -print0 \
+          find . -name '*.php' -not -path './bridge/node_modules/*' -print0 \
             | xargs -0 -n1 php -l
 
-      - name: Structural lint
-        run: python3 bin/lint-php.py
+  app-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
 
-      - name: WordPress coding standards
-        continue-on-error: true
-        run: |
-          composer global require --no-interaction --quiet \
-            wp-coding-standards/wpcs:^3 dealerdirect/phpcodesniffer-composer-installer
-          "$HOME/.composer/vendor/bin/phpcs" --standard=WordPress \
-            --ignore=node_modules,assets/css . || true
-
-      - uses: actions/setup-node@v4
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
         with:
-          node-version: 20
-          cache: npm
+          php-version: '8.3'
 
-      - name: Build the stylesheet
+      - name: Seed the demo database
+        run: php bin/seed.php
+
+      - name: Boot the app and smoke-test routes
         run: |
-          npm ci
-          npm run build
-
-      - name: Fail if the committed stylesheet is stale
-        run: |
-          if ! git diff --quiet -- assets/css/cartly.css; then
-            echo "assets/css/cartly.css is out of date — run 'npm run build' and commit it."
-            git diff --stat -- assets/css/cartly.css
-            exit 1
-          fi
-
-      - name: Fail if design tokens drifted from the platform repo
-        run: ./bin/sync-tokens.sh --check
+          php -S 0.0.0.0:8080 -t public >/tmp/php-server.log 2>&1 &
+          SERVER_PID=$!
+          trap 'kill $SERVER_PID 2>/dev/null' EXIT
+          sleep 2
+          for route in "/" "/login"; do
+            code=$(curl -s -o /dev/null -w '%{http_code}' "http://127.0.0.1:8080$route")
+            echo "$route -> $code"
+            test "$code" = "200"
+          done
