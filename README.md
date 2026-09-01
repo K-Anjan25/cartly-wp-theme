@@ -27,7 +27,8 @@ remain.
 - Each user belongs to exactly one **business (tenant)**.
 - Every query is scoped to the user's business (a `tid()` guard), so a user never
   sees another business's invoices, buyers, payments or disputes.
-- One-click **demo logins** keep the product instantly viewable.
+- **Email + password sign-up** at `/signup` and optional **Google Sign-In**
+  (OAuth 2.0, config-driven).
 
 ## Stack
 

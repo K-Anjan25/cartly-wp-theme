@@ -26,6 +26,19 @@ return array(
 	// Session lifetime (seconds).
 	'session_ttl'         => 7 * 86400,
 
+	// Google Sign-In (OAuth 2.0 Authorization Code flow). Optional: when the
+	// client_id is empty the "Continue with Google" button is hidden and the
+	// /auth/google routes are inert. Set these via env or edit below. The
+	// redirect_uri must be registered exactly in the Google Cloud Console; if
+	// left empty it is derived from the incoming Host header at runtime so the
+	// live preview (https://{port}-{sandboxId}.e2b.app) works without config.
+	'google_oauth'        => array(
+		'client_id'     => getenv( 'GOOGLE_CLIENT_ID' ) ?: '',
+		'client_secret' => getenv( 'GOOGLE_CLIENT_SECRET' ) ?: '',
+		// Order of precedence: env > explicit redirect_uri below > runtime Host.
+		'redirect_uri'  => getenv( 'GOOGLE_REDIRECT_URI' ) ?: '',
+	),
+
 	// App.
 	'name'                => 'PayKaro',
 	'tagline'             => 'MSME invoice & receivables tracker',

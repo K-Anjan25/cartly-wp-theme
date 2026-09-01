@@ -34,7 +34,8 @@ A single-tenant-database, web app with **real auth + per-business isolation**:
 - Each user belongs to exactly one **business (tenant)**.
 - Every query is scoped to the user's business — a user can never see another
   business's invoices, buyers, payments or disputes (enforced in the data layer).
-- One-click **demo logins** so the product stays instantly viewable.
+- **Email + password sign-up** at `/signup` (creates a business + owner).
+- Optional **Google Sign-In** (OAuth 2.0 Authorization Code flow).
 
 ## Stack
 
@@ -49,7 +50,10 @@ A single-tenant-database, web app with **real auth + per-business isolation**:
 ## Data model (`schema.sql`)
 
 - `businesses` — the tenant root (name, GSTIN, PAN, Udyam, bank details, TReDS flag).
-- `users` — `business_id` FK, email UNIQUE, password hash, role (`owner|accountant|viewer`).
+- `users` — `business_id` FK, email UNIQUE, password hash (nullable for OAuth-only
+  users), role (`owner|accountant|viewer`), provider (`email|google`), `google_id`,
+  `avatar_url`.
+- `oauth_states` — one-time CSRF state for the Google OAuth callback (expiring).
 - `sessions` — `token` PK, `user_id`, `expires_at`.
 - `buyers` — `business_id` FK; type + TReDS onboarding status.
 - `invoices` — `business_id` FK, `buyer_id` FK; dates, amounts, status, TReDS status.

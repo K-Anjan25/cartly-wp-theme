@@ -333,6 +333,13 @@ function loginPage( array $config ): string {
 		.pk-cta{width:100%;display:inline-flex;align-items:center;justify-content:center;border-radius:12px;padding:.7rem 1rem;font-size:.92rem;font-weight:700;border:0;cursor:pointer;background:#d6f45a;color:#10231e;transition:transform .15s,filter .15s;box-shadow:0 10px 22px rgba(214,244,90,.4);}
 		.pk-cta:hover{transform:translateY(-1px);filter:brightness(.97);}
 		.pk-err{background:#f9e0d8;border-left:4px solid #e7684f;border-radius:0 12px 12px 0;padding:.75rem 1rem;font-size:.85rem;color:#10231e;margin-bottom:1.1rem;}
+		.pk-google{display:flex;align-items:center;justify-content:center;gap:.6rem;width:100%;border-radius:12px;padding:.7rem 1rem;font-size:.92rem;font-weight:700;border:1px solid rgba(16,35,30,.16);background:#fff;color:var(--n-ink);text-decoration:none;transition:all .15s;margin-bottom:.9rem;}
+		.pk-google:hover{border-color:#1d4c3b;background:#faf9f2;transform:translateY(-1px);}
+		.pk-or{display:flex;align-items:center;gap:.7rem;color:#7c8f86;font-size:.76rem;font-weight:600;margin:.2rem 0 1rem;}
+		.pk-or::before,.pk-or::after{content:"";flex:1;height:1px;background:rgba(16,35,30,.14);}
+		.pk-alt{font-size:.85rem;color:#587169;margin-top:1.3rem;text-align:center;}
+		.pk-alt a{color:#1d4c3b;font-weight:700;text-decoration:none;}
+		.pk-alt a:hover{text-decoration:underline;}
 		@media (max-width:940px){.pk-authbrand{display:none;}.pk-formside{padding:2rem 1.3rem;}}
 	</style></head>
 	<body class="pkg" style="margin:0;">
@@ -366,13 +373,120 @@ function loginPage( array $config ): string {
 				<h1 class="pk-heading">Welcome back</h1>
 				<p class="pk-sub">Sign in to your workspace. Each user sees only their own business's receivables.</p>
 
-				<?php if ( ! empty( $_GET['err'] ) ) : ?><div class="pk-err">Invalid email or password. Please check your details and try again.</div><?php endif; ?>
+				<?php if ( ! empty( $_GET['err'] ) ) : ?>
+					<?php if ( 'oauth' === ( $_GET['err'] ?? '' ) ) : ?><div class="pk-err">Google sign-in didn't complete. Please try again, or use email &amp; password.</div>
+					<?php else : ?><div class="pk-err">Invalid email or password. Please check your details and try again.</div><?php endif; ?>
+				<?php endif; ?>
+
+				<?php echo googleButtonHtml( $config ); ?>
+				<?php if ( googleEnabled( $config ) ) : ?><div class="pk-or">or</div><?php endif; ?>
 
 				<form method="post" action="/login">
 					<label class="pk-label">Email</label><input class="pk-input" type="email" name="email" required placeholder="you@company.in" autofocus>
 					<label class="pk-label">Password</label><input class="pk-input" type="password" name="password" required placeholder="••••••••">
 					<button class="pk-cta" type="submit">Sign in →</button>
 				</form>
+
+				<div class="pk-alt">New to <?php echo e( $config['name'] ); ?>? <a href="/signup">Create an account</a></div>
+			</div>
+		</div>
+	</div>
+	</body>
+	</html>
+	<?php
+	return ob_get_clean();
+}
+
+/* Public sign-up page — mirrors the login split layout. */
+function signupPage( array $config ): string {
+	ob_start();
+	?>
+	<!doctype html>
+	<html lang="en">
+	<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Create account — <?php echo e( $config['name'] ); ?></title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="/assets/app.css">
+	<style>
+		.pk-login{min-height:100vh;display:flex;font-family:var(--n-font);}
+		.pk-authbrand{flex:0 0 46%;max-width:46%;background:linear-gradient(165deg,#10231e 0%,#17342b 58%,#0e2a20 100%);color:#eef2e6;display:flex;flex-direction:column;justify-content:space-between;padding:2.8rem 2.9rem;position:relative;overflow:hidden;}
+		.pk-authbrand::before{content:"";position:absolute;top:-6rem;right:-6rem;width:20rem;height:20rem;border-radius:999px;background:radial-gradient(circle,#d6f45a33,transparent 60%);}
+		.pk-authbrand::after{content:"";position:absolute;inset:0;opacity:.05;background-image:url("https://www.transparenttextures.com/patterns/noise-pattern-with-subtle-cross-lines.png");pointer-events:none;}
+		.pk-brandrow{display:flex;align-items:center;gap:.8rem;position:relative;z-index:1;}
+		.pk-brandname{font-family:var(--n-display);font-weight:600;font-size:1.5rem;letter-spacing:-.02em;line-height:1.05;color:#fff;}
+		.pk-brandname .pk-karo{color:#d6f45a;}
+		.pk-tagline{font-size:.78rem;color:#9db0a5;margin-top:.15rem;}
+		.pk-bigline{font-family:var(--n-display);font-size:2.35rem;font-weight:600;letter-spacing:-.03em;line-height:1.16;margin-bottom:1.1rem;color:#fff;}
+		.pk-copy{color:#c7d0de;font-size:.94rem;line-height:1.68;max-width:26rem;margin:0;}
+		.pk-chips{display:flex;gap:.6rem;margin-top:1.7rem;flex-wrap:wrap;}
+		.pk-chip{background:rgba(214,244,90,.12);color:#d6f45a;border:1px solid rgba(214,244,90,.2);border-radius:999px;padding:.35rem .75rem;font-size:.74rem;font-weight:600;}
+		.pk-authfoot{font-size:.74rem;color:#7f948a;position:relative;z-index:1;}
+		.pk-formside{flex:1;display:flex;align-items:center;justify-content:center;padding:2rem;background:radial-gradient(circle at 88% 6%,rgba(214,244,90,.22),transparent 20rem),linear-gradient(180deg,#f5f4ed 0%,#eef1e9 55%,#f5f4ed 100%);}
+		.pk-pagewrap{width:100%;max-width:24.5rem;}
+		.pk-heading{font-family:var(--n-display);font-size:1.9rem;font-weight:600;letter-spacing:-.02em;line-height:1.1;color:var(--n-ink);}
+		.pk-sub{color:#587169;font-size:.92rem;margin:.55rem 0 1.5rem;line-height:1.6;}
+		.pk-label{display:block;font-size:.72rem;font-weight:700;color:#7c8f86;margin-bottom:.35rem;}
+		.pk-input{width:100%;height:2.65rem;border-radius:12px;border:1px solid rgba(16,35,30,.15);background:#fffdf6;color:var(--n-ink);padding:0 .9rem;font-size:.9rem;transition:all .15s;margin-bottom:.95rem;}
+		.pk-input:focus{outline:none;border-color:#1d4c3b;box-shadow:0 0 0 3px #eaf9b8;}
+		.pk-cta{width:100%;display:inline-flex;align-items:center;justify-content:center;border-radius:12px;padding:.7rem 1rem;font-size:.92rem;font-weight:700;border:0;cursor:pointer;background:#d6f45a;color:#10231e;transition:transform .15s,filter .15s;box-shadow:0 10px 22px rgba(214,244,90,.4);}
+		.pk-cta:hover{transform:translateY(-1px);filter:brightness(.97);}
+		.pk-err{background:#f9e0d8;border-left:4px solid #e7684f;border-radius:0 12px 12px 0;padding:.75rem 1rem;font-size:.85rem;color:#10231e;margin-bottom:1.1rem;}
+		.pk-google{display:flex;align-items:center;justify-content:center;gap:.6rem;width:100%;border-radius:12px;padding:.7rem 1rem;font-size:.92rem;font-weight:700;border:1px solid rgba(16,35,30,.16);background:#fff;color:var(--n-ink);text-decoration:none;transition:all .15s;margin-bottom:.9rem;}
+		.pk-google:hover{border-color:#1d4c3b;background:#faf9f2;transform:translateY(-1px);}
+		.pk-or{display:flex;align-items:center;gap:.7rem;color:#7c8f86;font-size:.76rem;font-weight:600;margin:.2rem 0 1rem;}
+		.pk-or::before,.pk-or::after{content:"";flex:1;height:1px;background:rgba(16,35,30,.14);}
+		.pk-alt{font-size:.85rem;color:#587169;margin-top:1.3rem;text-align:center;}
+		.pk-alt a{color:#1d4c3b;font-weight:700;text-decoration:none;}
+		.pk-alt a:hover{text-decoration:underline;}
+		@media (max-width:940px){.pk-authbrand{display:none;}.pk-formside{padding:2rem 1.3rem;}}
+	</style></head>
+	<body class="pkg" style="margin:0;">
+	<div class="pk-login">
+		<!-- Brand panel -->
+		<div class="pk-authbrand">
+			<div style="position:relative;z-index:1;">
+				<div class="pk-brandrow">
+					<?php echo logoMark(); ?>
+					<div>
+						<div class="pk-brandname"><span>Pay</span><span class="pk-karo">Karo</span></div>
+						<div class="pk-tagline"><?php echo e( $config['tagline'] ); ?></div>
+					</div>
+				</div>
+			</div>
+			<div style="position:relative;z-index:1;">
+				<div class="pk-bigline">Turn invoice mess into<br>finance-ready receivables.</div>
+				<p class="pk-copy">Create an account, add a buyer, and raise your first invoice in minutes. Your receivables, interest and evidence — all in one pipeline.</p>
+				<div class="pk-chips">
+					<span class="pk-chip">🔒 Multi-tenant secured</span>
+					<span class="pk-chip">⚙ TReDS-ready</span>
+					<span class="pk-chip">⏱ 45-day due window</span>
+				</div>
+			</div>
+			<div class="pk-authfoot">&copy; <?php echo e( $config['name'] ); ?> · demo</div>
+		</div>
+
+		<!-- Form panel -->
+		<div class="pk-formside">
+			<div class="pk-pagewrap">
+				<h1 class="pk-heading">Create your account</h1>
+				<p class="pk-sub">Set up your business and you're in. Each user sees only their own business's receivables.</p>
+
+				<?php if ( ! empty( $_GET['err'] ) ) : ?><div class="pk-err"><?php echo 'taken' === ( $_GET['err'] ?? '' ) ? 'That email is already registered. Try signing in instead.' : 'Please fill in every field correctly and try again.'; ?></div><?php endif; ?>
+
+				<?php echo googleButtonHtml( $config ); ?>
+				<?php if ( googleEnabled( $config ) ) : ?><div class="pk-or">or</div><?php endif; ?>
+
+				<form method="post" action="/signup">
+					<label class="pk-label">Business name</label><input class="pk-input" type="text" name="business_name" placeholder="Your company Pvt Ltd" autofocus>
+					<label class="pk-label">Your name</label><input class="pk-input" type="text" name="name" placeholder="Full name" required>
+					<label class="pk-label">Work email</label><input class="pk-input" type="email" name="email" placeholder="you@company.in" required>
+					<label class="pk-label">Password</label><input class="pk-input" type="password" name="password" placeholder="Create a password" required minlength="8">
+					<button class="pk-cta" type="submit">Create account →</button>
+				</form>
+
+				<div class="pk-alt">Already have an account? <a href="/login">Sign in</a></div>
 			</div>
 		</div>
 	</div>
@@ -652,7 +766,7 @@ function landingPage( array $config ): string {
 						<p class="text-xs font-bold uppercase tracking-[0.16em] text-[#d6f45a]">Ready</p>
 						<h2 class="display-face mt-4 text-4xl font-semibold leading-tight tracking-[-0.04em] text-white sm:text-5xl">Make every invoice count.</h2>
 					</div>
-					<a href="/login" class="focus-ring mt-7 inline-flex rounded-xl bg-[#d6f45a] px-6 py-3.5 font-bold text-[#10231e] transition hover:-translate-y-0.5 lg:mt-0">Try PayKaro free</a>
+					<a href="/signup" class="focus-ring mt-7 inline-flex rounded-xl bg-[#d6f45a] px-6 py-3.5 font-bold text-[#10231e] transition hover:-translate-y-0.5 lg:mt-0">Try PayKaro free</a>
 				</div>
 			</section>
 		</main>
@@ -708,7 +822,7 @@ function pricingPage( array $config ): string {
 			'price' => 'Free',
 			'per' => 'forever',
 			'blurb' => 'For a single MSME getting its receivables in order.',
-			'cta' => '/login',
+			'cta' => '/signup',
 			'cta_label' => 'Start free',
 			'highlight' => false,
 			'features' => array( 'Up to 25 invoices', '1 user (owner)', 'Invoice pipeline + interest', 'Evidence checklist', 'Demo data included' ),
@@ -718,7 +832,7 @@ function pricingPage( array $config ): string {
 			'price' => '₹1,499',
 			'per' => '/month · per business',
 			'blurb' => 'For growing suppliers who finance and claim often.',
-			'cta' => '/login',
+			'cta' => '/signup',
 			'cta_label' => 'Try Pro free',
 			'highlight' => true,
 			'features' => array( 'Unlimited invoices', '3 users (owner + accountant)', 'TReDS / finance queue', 'MSEFC claim packet builder', 'Advanced reports & export', 'Priority support' ),
@@ -1346,7 +1460,7 @@ $p      = $_POST ?? array();
 $response = array( 'status' => 200, 'type' => 'text/html; charset=utf-8', 'location' => null, 'cookies' => array(), 'body' => '' );
 
 // Public paths.
-$public = array( '/login', '/logout', '/assets' );
+$public = array( '/login', '/logout', '/assets', '/signup', '/auth/google', '/auth/google/callback' );
 
 // ---- Auth resolution ----
 $user = null;
@@ -1381,12 +1495,97 @@ if ( 'POST' === $method && '/logout' === $path ) {
 	exit;
 }
 
+// ---- POST: sign-up (public) ---- creates a business + owner and logs them in.
+if ( 'POST' === $method && '/signup' === $path ) {
+	$d = array(
+		'business_name' => (string) ( $p['business_name'] ?? '' ),
+		'name'          => (string) ( $p['name'] ?? '' ),
+		'email'         => (string) ( $p['email'] ?? '' ),
+		'password'      => (string) ( $p['password'] ?? '' ),
+	);
+	$u = $app->registerBusiness( $d );
+	if ( ! $u ) {
+		$response['status']   = 302;
+		$response['location'] = '/signup?err=' . ( $app->userByEmail( $d['email'] ) ? 'taken' : 'fields' );
+		echo json_encode( $response );
+		exit;
+	}
+	$token = $app->createSession( (int) $u['id'] );
+	$response['status']   = 302;
+	$response['location'] = '/';
+	$response['cookies'][] = array( COOKIE_NAME, $token, (int) $config['session_ttl'] );
+	echo json_encode( $response );
+	exit;
+}
+
+// ---- GET: begin Google Sign-In (public) ---- generates a one-time CSRF state,
+// stores it, then bounces the browser over to Google.
+if ( '/auth/google' === $path ) {
+	if ( ! googleEnabled( $config ) ) {
+		$response['status']   = 302;
+		$response['location'] = '/login';
+		echo json_encode( $response );
+		exit;
+	}
+	$state = bin2hex( random_bytes( 16 ) );
+	$app->storeOAuthState( $state );
+	$response['status']   = 302;
+	$response['location'] = googleAuthUrl( $config, $state );
+	echo json_encode( $response );
+	exit;
+}
+
+// ---- GET: Google OAuth callback (public) ---- validates state, exchanges the
+// code for a token, fetches the profile, then provisions/signs the user in.
+if ( '/auth/google/callback' === $path ) {
+	$state = (string) ( $g['state'] ?? '' );
+	$code  = (string) ( $g['code'] ?? '' );
+	if ( '' === $state || '' === $code || ! $app->consumeOAuthState( $state ) ) {
+		// Missing/invalid state = CSRF or tampered request.
+		$response['status']   = 302;
+		$response['location'] = '/login?err=oauth';
+		echo json_encode( $response );
+		exit;
+	}
+	if ( isset( $g['error'] ) ) {
+		$response['status']   = 302;
+		$response['location'] = '/login?err=oauth';
+		echo json_encode( $response );
+		exit;
+	}
+	$token = googleExchange( $config, $code, googleRedirectUri( $config ) );
+	if ( ! $token ) {
+		$response['status']   = 302;
+		$response['location'] = '/login?err=oauth';
+		echo json_encode( $response );
+		exit;
+	}
+	$profile = googleProfile( (string) $token['access_token'] );
+	$u       = $profile ? $app->findOrCreateGoogleUser( $profile ) : null;
+	if ( ! $u ) {
+		$response['status']   = 302;
+		$response['location'] = '/login?err=oauth';
+		echo json_encode( $response );
+		exit;
+	}
+	$session = $app->createSession( (int) $u['id'] );
+	$response['status']   = 302;
+	$response['location'] = '/';
+	$response['cookies'][] = array( COOKIE_NAME, $session, (int) $config['session_ttl'] );
+	echo json_encode( $response );
+	exit;
+}
+
 // ---- Public pages: '/' landing, '/login', '/pricing' are public ----
 if ( ! $user ) {
 	$response['status'] = 200;
 	if ( '/' === $path ) { $response['body'] = landingPage( $config ); }
 	elseif ( '/pricing' === $path ) { $response['body'] = pricingPage( $config ); }
-	else { $response['body'] = loginPage( $config ); }
+	elseif ( '/signup' === $path ) { $response['body'] = signupPage( $config ); }
+	elseif ( '/auth/google' === $path || '/auth/google/callback' === $path ) {
+		$response['status']   = 302;
+		$response['location'] = '/login';
+	} else { $response['body'] = loginPage( $config ); }
 	echo json_encode( $response );
 	exit;
 }
@@ -1435,6 +1634,7 @@ $content = ''; $title = $config['name']; $active = 'dashboard';
 	switch ( $path ) {
 		case '/login':
 		case '/logout':
+		case '/signup':
 			$response['status']   = 302;
 			$response['location'] = '/';
 			echo json_encode( $response );
@@ -1468,4 +1668,126 @@ echo json_encode( $response );
 function redirect( string $loc, array &$response ): void {
 	$response['status']   = 302;
 	$response['location'] = $loc;
+}
+
+/* ------------------------------------------------------------------ */
+/* Google Sign-In (OAuth 2.0) helpers                                 */
+/* ------------------------------------------------------------------ */
+
+function googleEnabled( array $config ): bool {
+	return ! empty( $config['google_oauth']['client_id'] ) && ! empty( $config['google_oauth']['client_secret'] );
+}
+
+/**
+ * The redirect URI registered with Google. Prefer the explicit config/env
+ * value; otherwise derive it from the incoming Host header so the live
+ * preview (https://{port}-{sandboxId}.e2b.app) works without config.
+ */
+function googleRedirectUri( array $config ): string {
+	if ( ! empty( $config['google_oauth']['redirect_uri'] ) ) {
+		return $config['google_oauth']['redirect_uri'];
+	}
+	$host   = $_SERVER['HTTP_HOST'] ?? 'localhost';
+	$scheme = 'https'; // OAuth requires HTTPS for non-localhost live sites.
+	return $scheme . '://' . $host . '/auth/google/callback';
+}
+
+/** Build the Google authorization URL for the logged-out state. */
+function googleAuthUrl( array $config, string $state ): string {
+	$params = array(
+		'client_id'     => $config['google_oauth']['client_id'],
+		'redirect_uri'  => googleRedirectUri( $config ),
+		'response_type' => 'code',
+		'scope'         => 'openid email profile',
+		'state'         => $state,
+		'access_type'   => 'online',
+		'prompt'        => 'select_account',
+	);
+	return 'https://accounts.google.com/o/oauth2/v2/auth?' . http_build_query( $params );
+}
+
+/**
+ * Minimal HTTP helper using cURL when present, otherwise PHP streams. Returns
+ * a decoded array on success, or null on any failure.
+ */
+function paykaro_http( string $method, string $url, array $headers = array(), ?string $body = null ): ?array {
+	// cURL path (native PHP deployments).
+	if ( function_exists( 'curl_init' ) ) {
+		$ch = curl_init( $url );
+		curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true );
+		curl_setopt( $ch, CURLOPT_FOLLOWLOCATION, false );
+		curl_setopt( $ch, CURLOPT_TIMEOUT, 12 );
+		curl_setopt( $ch, CURLOPT_SSL_VERIFYPEER, true );
+		curl_setopt( $ch, CURLOPT_SSL_VERIFYHOST, 2 );
+		if ( 'POST' === $method ) {
+			curl_setopt( $ch, CURLOPT_POST, true );
+			curl_setopt( $ch, CURLOPT_POSTFIELDS, (string) $body );
+		}
+		$h = array();
+		foreach ( $headers as $k => $v ) { $h[] = $k . ': ' . $v; }
+		curl_setopt( $ch, CURLOPT_HTTPHEADER, $h );
+		$res = curl_exec( $ch );
+		$code = (int) curl_getinfo( $ch, CURLINFO_HTTP_CODE );
+		curl_close( $ch );
+		if ( false === $res ) { return null; }
+		$json = json_decode( (string) $res, true );
+		return is_array( $json ) ? $json : array( '_code' => $code, '_raw' => (string) $res );
+	}
+	// PHP streams fallback.
+	$hdr = '';
+	foreach ( $headers as $k => $v ) { $hdr .= $k . ': ' . $v . "\r\n"; }
+	$ctx = stream_context_create( array(
+		'http' => array(
+			'method'        => $method,
+			'header'        => $hdr,
+			'content'       => (string) $body,
+			'timeout'       => 12,
+			'ignore_errors' => true,
+		),
+		'ssl' => array( 'verify_peer' => true, 'verify_peer_name' => true ),
+	) );
+	$res = @file_get_contents( $url, false, $ctx );
+	if ( false === $res ) { return null; }
+	$json = json_decode( (string) $res, true );
+	return is_array( $json ) ? $json : array( '_raw' => (string) $res );
+}
+
+/** Exchange the authorization code for an access token. Returns token array or null. */
+function googleExchange( array $config, string $code, string $redirectUri ): ?array {
+	$body = http_build_query( array(
+		'code'          => $code,
+		'client_id'     => $config['google_oauth']['client_id'],
+		'client_secret' => $config['google_oauth']['client_secret'],
+		'redirect_uri'  => $redirectUri,
+		'grant_type'    => 'authorization_code',
+	) );
+	$res = paykaro_http( 'POST', 'https://oauth2.googleapis.com/token', array( 'Content-Type' => 'application/x-www-form-urlencoded' ), $body );
+	if ( ! $res || empty( $res['access_token'] ) ) {
+		return null;
+	}
+	return $res;
+}
+
+/** Fetch the Google profile (sub/email/name/picture) with the access token. */
+function googleProfile( string $accessToken ): ?array {
+	$res = paykaro_http( 'GET', 'https://www.googleapis.com/oauth2/v3/userinfo', array( 'Authorization' => 'Bearer ' . $accessToken ) );
+	if ( ! $res || empty( $res['sub'] ) || empty( $res['email'] ) ) {
+		return null;
+	}
+	return array(
+		'google_id'  => (string) $res['sub'],
+		'email'      => (string) $res['email'],
+		'name'       => (string) ( $res['name'] ?? '' ),
+		'avatar_url' => (string) ( $res['picture'] ?? '' ),
+	);
+}
+
+/** "Continue with Google" button, or '' when OAuth isn't configured. */
+function googleButtonHtml( array $config ): string {
+	if ( ! googleEnabled( $config ) ) {
+		return '';
+	}
+	$g = '<span aria-hidden="true" style="display:inline-flex;width:1.05rem;height:1.05rem;flex-shrink:0;">'
+		. '<svg viewBox="0 0 48 48" width="20" height="20"><path fill="#4285F4" d="M45.12 24.5c0-1.56-.14-3.06-.4-4.5H24v8.51h11.84a10.1 10.1 0 0 1-4.39 6.62v5.5h7.1c4.16-3.83 6.57-9.47 6.57-16.13z"/><path fill="#34A853" d="M24 46c5.94 0 10.92-1.97 14.56-5.33l-7.1-5.5c-1.97 1.32-4.49 2.1-7.46 2.1-5.73 0-10.58-3.87-12.31-9.07H4.34v5.67A21.98 21.98 0 0 0 24 46z"/><path fill="#FBBC05" d="M11.69 28.2a13.2 13.2 0 0 1 0-8.4v-5.67H4.34a21.98 21.98 0 0 0 0 19.74l7.35-5.67z"/><path fill="#EA4335" d="M24 10.75c3.23 0 6.12 1.11 8.4 3.29l6.3-6.3A21.96 21.96 0 0 0 24 2a21.98 21.98 0 0 0-19.66 12.13l7.35 5.67C13.42 14.62 18.27 10.75 24 10.75z"/></svg></span>';
+	return '<a class="pk-google" href="/auth/google">' . $g . ' Continue with Google</a>';
 }

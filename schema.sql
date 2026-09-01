@@ -21,10 +21,19 @@ CREATE TABLE IF NOT EXISTS users (
 	business_id INTEGER NOT NULL,
 	name        TEXT    NOT NULL,
 	email       TEXT    NOT NULL UNIQUE,
-	password    TEXT    NOT NULL,          -- password_hash()
+	password    TEXT,                      -- password_hash(); NULL for OAuth-only users
 	role        TEXT    NOT NULL DEFAULT 'owner',  -- owner|accountant|viewer
+	provider    TEXT    NOT NULL DEFAULT 'email',  -- email|google
+	google_id   TEXT,                      -- Google sub, when provider=google
+	avatar_url  TEXT,                      -- Google profile picture, when available
 	created_at  TEXT    NOT NULL DEFAULT (datetime('now')),
 	FOREIGN KEY (business_id) REFERENCES businesses(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS oauth_states (
+	state      TEXT PRIMARY KEY,
+	created_at TEXT NOT NULL DEFAULT (datetime('now')),
+	expires_at TEXT NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS sessions (
@@ -123,4 +132,6 @@ CREATE INDEX IF NOT EXISTS idx_invoices_business_due     ON invoices(business_id
 CREATE INDEX IF NOT EXISTS idx_invoices_buyer            ON invoices(buyer_id);
 CREATE INDEX IF NOT EXISTS idx_evidences_invoice         ON invoice_evidences(invoice_id);
 CREATE INDEX IF NOT EXISTS idx_users_email               ON users(email);
+CREATE INDEX IF NOT EXISTS idx_users_google_id           ON users(google_id);
 CREATE INDEX IF NOT EXISTS idx_sessions_token            ON sessions(token);
+CREATE INDEX IF NOT EXISTS idx_oauth_states_expires      ON oauth_states(expires_at);

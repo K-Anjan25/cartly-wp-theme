@@ -195,6 +195,12 @@ const server = http.createServer(async (req, res) => {
 		const rawBody = await parseBody(req);
 		const post = parsePost(rawBody, req.headers['content-type']);
 
+		// Reproduce config.php's getenv() reads inside the fresh PHP process.
+		const env = {};
+		for (const k of ['GOOGLE_CLIENT_ID','GOOGLE_CLIENT_SECRET','GOOGLE_REDIRECT_URI','PAYKARO_DB_DSN','PAYKARO_DB_USER','PAYKARO_DB_PASS']) {
+			if (process.env[k]) env[k] = process.env[k];
+		}
+
 		const requestCtx = {
 			method: req.method || 'GET',
 			uri: rawUrl,
@@ -202,6 +208,7 @@ const server = http.createServer(async (req, res) => {
 			post,
 			cookies: parseCookies(req.headers.cookie),
 			host,
+			env,
 		};
 
 		const j = await runApp(requestCtx);
