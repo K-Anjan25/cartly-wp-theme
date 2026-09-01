@@ -1,0 +1,6 @@
+# Shell scripts must keep LF or bash breaks on Windows checkouts.
+* text=auto eol=lf
+
+*.png binary
+*.jpg binary
+*.ico binary

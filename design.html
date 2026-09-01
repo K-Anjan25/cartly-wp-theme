@@ -1,0 +1,457 @@
+<!doctype html>
+<html lang="en">
+ <head><script>window["__codeletBootstrap__"]=JSON.parse('{"A":"A","B":"20260901-03-13e0786","C":{"Abril Fatface":"YACgEZbkUVE,0","Alfa Slab One":"YACgEYS9sJU,0","Anton":"YACgEcYqQ-A,0","Archivo":"YAHO2-t-jNE,0","Arial":"YAGyDvJ_4Ts,0","Bebas Neue":"YACgESME5ew,0","Bricolage Grotesque":"YAFyMcdwzpc,0","Canva Sans":"YAFLd8sKbwc,2","Caveat":"YALBs2ploWQ,0","Comic Sans MS":"YAHO2VMiyZo,0","Cormorant Garamond":"YAFdJhX-538,0","Courier New":"YAGzXiGs0_8,0","DM Sans":"YAD1aU3sLnI,0","DM Serif Display":"YAD1aYG82rc,0","Forum":"YACgEcnnqB4,0","Fraunces":"YAEul-FRQw4,0","Georgia":"YAGzXkO0pEM,0","Helvetica Neue":"YAFcf6CtJfI,0","Impact":"YAFcfnjI7Vk,0","Inter":"YAFdJvSyp_k,3","Iowan Old Style":"YAGNIFa8j9o,0","Jacques Francois":"YAHO2a5g66Q,0","JetBrains Mono":"YAFdJksXcAk,0","Libre Baskerville":"YACgEUFdPdA,0","Manrope":"YAHO2b2feC4,0","Merriweather":"YACgEXvHxxs,0","Montserrat":"YADLjI9qxTA,0","Nunito":"YACgEX8C5Gg,0","Oleo Script":"YACgEQQ14jI,0","Phantom Sans":"YAHO2E8Pb88,0","Playfair Display":"YACgEYmuCJE,0","Poppins":"YAFdJjbTu24,1","Press Start 2P":"YAFyGr-8pmQ,0","Quicksand":"YADWjpfPmdk,0","Raleway":"YACgEVg3xZg,0","Segoe UI":"YAHNdRD1Klw,0","Source Sans 3":"YAG4lO1Mj10,0","Spectral":"YAHO2rVUHIM,0","Times New Roman":"YAGzXW3gftg,0","Times":"YAGzXW3gftg,0","Ubuntu":"YACgERDU--Q,0","Work Sans":"YAGXhLOKv44,0","Yellowtail":"YACgEYG4kG4,0","ui-monospace":"YADlN8CFZ8Q,0","ui-sans-serif":"YACkoN-xg4g,0"}}');</script><script src="/_sdk/50d846425a1e5082.telemetry_sdk.js" integrity="sha512-Otbex+ztlVbcEGql0rXGd/3E3ee/hqAntg6DeuUEMG6pIPbXGOSvZbFZVzknAXi1tH/itQ+ijEhOTr2aWj6CXg=="></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PayKaro — Make every invoice count</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&amp;family=Fraunces:opsz,wght@9..144,600;9..144,700&amp;display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ink: #10231e;
+      --paper: #f5f4ed;
+      --moss: #1d4c3b;
+      --lime: #d6f45a;
+      --muted: #587169;
+      --line: rgba(16, 35, 30, 0.16);
+      --coral: #e7684f;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      width: 100%;
+      font-family: "DM Sans", sans-serif;
+      color: var(--ink);
+      background: var(--paper);
+    }
+
+    .page-shell {
+      width: 100%;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 91% 7%, rgba(214, 244, 90, 0.3), transparent 25rem),
+        linear-gradient(180deg, #f5f4ed 0%, #eef1e9 55%, #f5f4ed 100%);
+    }
+
+    .display-face { font-family: "Fraunces", serif; }
+    .grain {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0.035;
+      z-index: 30;
+      background-image: url("https://www.transparenttextures.com/patterns/noise-pattern-with-subtle-cross-lines.png");
+    }
+
+    .nav-link {
+      color: #426057;
+      text-decoration: none;
+      transition: color 180ms ease;
+    }
+    .nav-link:hover { color: var(--ink); }
+
+    .focus-ring:focus-visible {
+      outline: 3px solid #d6f45a;
+      outline-offset: 3px;
+    }
+
+    .hero-grid {
+      background-image:
+        linear-gradient(rgba(29, 76, 59, 0.07) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(29, 76, 59, 0.07) 1px, transparent 1px);
+      background-size: 32px 32px;
+    }
+
+    .entry {
+      animation: rise 700ms both cubic-bezier(.2,.8,.2,1);
+    }
+    .entry-delay-1 { animation-delay: 110ms; }
+    .entry-delay-2 { animation-delay: 210ms; }
+    .entry-delay-3 { animation-delay: 310ms; }
+
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(18px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .dashboard-shadow { box-shadow: 0 30px 75px rgba(14, 48, 37, 0.24); }
+    .pipeline-line {
+      height: 2px;
+      background: linear-gradient(90deg, #d6f45a 0%, #d6f45a 72%, rgba(214, 244, 90, .25) 72%);
+    }
+
+    .receipt-paper {
+      background: linear-gradient(135deg, #fffdf4 0%, #f1eddf 100%);
+      box-shadow: 12px 14px 0 rgba(16, 35, 30, 0.1);
+      transform: rotate(3deg);
+    }
+
+    .feature-card { transition: transform 220ms ease, box-shadow 220ms ease; }
+    .feature-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 22px 42px rgba(16, 35, 30, 0.12);
+    }
+
+    .preview-hidden { display: none; }
+
+    @media (max-width: 767px) {
+      .desktop-nav { display: none; }
+      .mobile-nav-open { display: flex; }
+    }
+  </style>
+  <script src="/_sdk/b3bf9e8ac58e6ad6.data_sdk.js" type="text/javascript" integrity="sha512-otc1u9NYq9Ms5Jt//7vmhrrqR5CLPr8Jdgs6741gqniClfLMcfmC+jK/cKuQdhLv6G0esJ/FzaMS9tv0T/vj/Q=="></script>
+  <script src="/_sdk/2cfae6c35b9820dc.resizing_sdk.js" type="text/javascript" integrity="sha512-Oy+wKa9tloayelgS18tBfR707QfWMdeA8unVpm1M0/W/edVyjcRCNO6/jCvDwt/HpUta1v7sfMHiF1mAVr5RIA=="></script>
+ </head>
+ <body data-template-id="__page-root">
+  <div class="page-shell">
+   <div class="grain" aria-hidden="true"></div>
+   <header class="w-full sticky top-0 z-20 border-b border-[#10231e]/10 bg-[#f5f4ed]/90 backdrop-blur-md">
+    <nav class="mx-auto flex max-w-7xl items-center justify-between px-5 py-4 lg:px-8" aria-label="Primary navigation"><a href="#top" class="focus-ring flex items-center gap-2 rounded-md" aria-label="PayKaro home"> <span class="flex h-9 w-9 items-center justify-center rounded-xl bg-[#1d4c3b] text-lg font-bold text-[#d6f45a]">₹</span> <span data-template-id="brand-name" class="canva-text text-xl font-bold tracking-tight"></span> </a>
+     <div class="desktop-nav hidden items-center gap-7 text-sm font-medium md:flex"><a class="nav-link focus-ring rounded" href="#workflow">Workflow</a> <a class="nav-link focus-ring rounded" href="#finance">Financing</a> <a class="nav-link focus-ring rounded" href="#evidence">Evidence</a> <a class="nav-link focus-ring rounded" href="#claims">Claims</a>
+     </div>
+     <div class="hidden md:block"><button id="header-demo-button" type="button" data-template-id="header-demo-button" class="canva-button focus-ring rounded-xl px-4 py-2.5 text-sm font-bold transition hover:-translate-y-0.5"></button>
+     </div><button id="mobile-menu-button" type="button" class="focus-ring flex h-10 w-10 items-center justify-center rounded-xl border border-[#10231e]/15 text-[#10231e] md:hidden" aria-controls="mobile-menu" aria-expanded="false" aria-label="Open navigation menu"> <i data-lucide="menu" aria-hidden="true"></i> </button>
+    </nav>
+    <div id="mobile-menu" class="hidden border-t border-[#10231e]/10 bg-[#f5f4ed] px-5 py-5 md:hidden">
+     <div class="flex flex-col gap-4 text-sm font-semibold"><a class="nav-link focus-ring rounded" href="#workflow">Workflow</a> <a class="nav-link focus-ring rounded" href="#finance">Financing</a> <a class="nav-link focus-ring rounded" href="#evidence">Evidence</a> <a class="nav-link focus-ring rounded" href="#claims">Claims</a> <button id="mobile-demo-button" type="button" data-template-id="mobile-demo-button" class="canva-button focus-ring mt-2 rounded-xl px-4 py-3 text-left font-bold"></button>
+     </div>
+    </div>
+   </header>
+   <main id="top">
+    <section class="hero-grid relative w-full border-b border-[#10231e]/10">
+     <div class="mx-auto grid max-w-7xl gap-12 px-5 py-16 lg:grid-cols-[1.02fr_.98fr] lg:px-8 lg:py-24">
+      <div class="relative z-10 self-center">
+       <div data-template-id="hero-eyebrow" class="canva-tag entry inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-bold uppercase tracking-[0.14em]"><span class="h-2 w-2 rounded-full bg-current"></span>
+       </div>
+       <h1 data-template-id="hero-title" class="canva-text display-face entry entry-delay-1 mt-6 max-w-3xl text-[clamp(3rem,6vw,5.75rem)] font-semibold leading-[0.98] tracking-[-0.055em]"></h1>
+       <p data-template-id="hero-description" class="canva-text entry entry-delay-2 mt-6 max-w-xl text-lg leading-8 text-[#426057]"></p>
+       <div class="entry entry-delay-3 mt-8 flex flex-col gap-3 sm:flex-row"><button id="hero-demo-button" type="button" data-template-id="hero-demo-button" class="canva-button focus-ring rounded-xl px-6 py-3.5 font-bold transition hover:-translate-y-0.5"> </button> <a href="#workflow" data-template-id="hero-secondary-link" class="canva-link focus-ring inline-flex items-center justify-center gap-2 rounded-xl border px-6 py-3.5 font-bold transition hover:bg-white"> <span data-template-id="hero-secondary-text" class="canva-text"></span> <i data-lucide="arrow-down-right" class="h-4 w-4" aria-hidden="true"></i> </a>
+       </div>
+       <div class="mt-11 flex flex-wrap gap-x-7 gap-y-4 border-t border-[#10231e]/15 pt-6">
+        <div class="flex items-center gap-2 text-sm font-semibold text-[#31564b]"><i data-lucide="shield-check" class="h-4 w-4 text-[#1d4c3b]" aria-hidden="true"></i> <span data-template-id="hero-trust-one" class="canva-text"></span>
+        </div>
+        <div class="flex items-center gap-2 text-sm font-semibold text-[#31564b]"><i data-lucide="file-check-2" class="h-4 w-4 text-[#1d4c3b]" aria-hidden="true"></i> <span data-template-id="hero-trust-two" class="canva-text"></span>
+        </div>
+       </div>
+      </div>
+      <div class="entry entry-delay-2 relative mx-auto w-full max-w-2xl lg:pt-4">
+       <div class="absolute -right-7 top-4 h-32 w-32 rounded-full bg-[#d6f45a] blur-2xl opacity-70" aria-hidden="true"></div>
+       <div class="dashboard-shadow relative overflow-hidden rounded-[1.8rem] bg-[#10231e] p-4 sm:p-6">
+        <div class="mb-6 flex items-center justify-between border-b border-white/10 pb-5">
+         <div>
+          <p data-template-id="dashboard-label" class="canva-text text-xs font-bold uppercase tracking-[0.16em]"></p>
+          <p data-template-id="dashboard-business" class="canva-text mt-1 text-lg font-semibold"></p>
+         </div><span data-template-id="dashboard-live-tag" class="canva-tag rounded-full px-3 py-1 text-xs font-bold"></span>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+         <article class="rounded-2xl bg-white/[0.08] p-4">
+          <p data-template-id="metric-one-label" class="canva-text text-xs font-medium"></p>
+          <p data-template-id="metric-one-value" class="canva-text mt-2 text-2xl font-bold tracking-tight"></p>
+          <p data-template-id="metric-one-note" class="canva-text mt-1 text-xs"></p>
+         </article>
+         <article class="rounded-2xl bg-[#d6f45a] p-4">
+          <p data-template-id="metric-two-label" class="canva-text text-xs font-bold"></p>
+          <p data-template-id="metric-two-value" class="canva-text mt-2 text-2xl font-bold tracking-tight"></p>
+          <p data-template-id="metric-two-note" class="canva-text mt-1 text-xs"></p>
+         </article>
+        </div>
+        <div class="mt-4 rounded-2xl bg-white p-4 sm:p-5">
+         <div class="flex items-center justify-between">
+          <div>
+           <p data-template-id="invoice-card-label" class="canva-text text-xs font-bold uppercase tracking-[0.14em]"></p>
+           <p data-template-id="invoice-card-number" class="canva-text mt-1 text-sm font-bold"></p>
+          </div><span data-template-id="invoice-card-status" class="canva-tag rounded-full px-2.5 py-1 text-xs font-bold"></span>
+         </div>
+         <div class="mt-5">
+          <div class="pipeline-line"></div>
+          <div class="mt-2 grid grid-cols-4 text-[10px] font-bold uppercase tracking-wide text-[#55726a]"><span data-template-id="stage-raised" class="canva-text"></span> <span data-template-id="stage-accepted" class="canva-text text-center"></span> <span data-template-id="stage-financed" class="canva-text text-center"></span> <span data-template-id="stage-settled" class="canva-text text-right"></span>
+          </div>
+         </div>
+         <div class="mt-5 flex items-end justify-between border-t border-[#10231e]/10 pt-4">
+          <div>
+           <p data-template-id="invoice-balance-label" class="canva-text text-xs font-medium"></p>
+           <p data-template-id="invoice-balance-value" class="canva-text mt-1 text-xl font-bold"></p>
+          </div>
+          <div class="text-right">
+           <p data-template-id="invoice-interest-label" class="canva-text text-xs font-medium"></p>
+           <p data-template-id="invoice-interest-value" class="canva-text mt-1 text-sm font-bold"></p>
+          </div>
+         </div>
+        </div>
+       </div>
+       <div class="receipt-paper absolute -bottom-8 -left-4 hidden w-44 rounded-xl border border-[#10231e]/10 p-4 md:block">
+        <div class="flex items-center justify-between"><i data-lucide="file-check-2" class="h-5 w-5 text-[#1d4c3b]" aria-hidden="true"></i> <span class="h-2 w-2 rounded-full bg-[#1d4c3b]"></span>
+        </div>
+        <p data-template-id="receipt-title" class="canva-text mt-4 text-xs font-bold"></p>
+        <p data-template-id="receipt-subtitle" class="canva-text mt-1 text-[11px] leading-4 text-[#587169]"></p>
+       </div>
+      </div>
+     </div>
+    </section>
+    <section class="w-full bg-[#1d4c3b] py-5">
+     <div class="mx-auto grid max-w-7xl grid-cols-2 gap-y-5 px-5 sm:grid-cols-4 lg:px-8">
+      <div class="border-r border-white/15 pr-4">
+       <p data-template-id="bar-stat-one-value" class="canva-text text-2xl font-bold"></p>
+       <p data-template-id="bar-stat-one-label" class="canva-text mt-1 text-xs font-medium"></p>
+      </div>
+      <div class="border-r border-white/15 px-4">
+       <p data-template-id="bar-stat-two-value" class="canva-text text-2xl font-bold"></p>
+       <p data-template-id="bar-stat-two-label" class="canva-text mt-1 text-xs font-medium"></p>
+      </div>
+      <div class="border-r border-white/15 pr-4 sm:px-4">
+       <p data-template-id="bar-stat-three-value" class="canva-text text-2xl font-bold"></p>
+       <p data-template-id="bar-stat-three-label" class="canva-text mt-1 text-xs font-medium"></p>
+      </div>
+      <div class="px-4">
+       <p data-template-id="bar-stat-four-value" class="canva-text text-2xl font-bold"></p>
+       <p data-template-id="bar-stat-four-label" class="canva-text mt-1 text-xs font-medium"></p>
+      </div>
+     </div>
+    </section>
+    <section id="workflow" class="w-full px-5 py-20 lg:px-8 lg:py-28">
+     <div class="mx-auto max-w-7xl">
+      <div class="grid gap-8 lg:grid-cols-[.7fr_1.3fr] lg:items-end">
+       <div>
+        <p data-template-id="workflow-eyebrow" class="canva-text text-xs font-bold uppercase tracking-[0.16em]"></p>
+        <h2 data-template-id="workflow-title" class="canva-text display-face mt-4 text-4xl font-semibold leading-tight tracking-[-0.04em] sm:text-5xl"></h2>
+       </div>
+       <p data-template-id="workflow-description" class="canva-text max-w-2xl text-lg leading-8 text-[#587169]"></p>
+      </div>
+      <div class="mt-14 grid gap-4 md:grid-cols-4">
+       <article data-template-id="workflow-raised-card" class="canva-card rounded-2xl border p-5"><span class="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-[#10231e] text-sm font-bold text-white">01</span>
+        <h3 data-template-id="workflow-raised-title" class="canva-text mt-7 text-xl font-bold"></h3>
+        <p data-template-id="workflow-raised-text" class="canva-text mt-3 text-sm leading-6 text-[#587169]"></p>
+       </article>
+       <article data-template-id="workflow-accepted-card" class="canva-card rounded-2xl border p-5"><span class="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-[#d6f45a] text-sm font-bold text-[#10231e]">02</span>
+        <h3 data-template-id="workflow-accepted-title" class="canva-text mt-7 text-xl font-bold"></h3>
+        <p data-template-id="workflow-accepted-text" class="canva-text mt-3 text-sm leading-6 text-[#587169]"></p>
+       </article>
+       <article data-template-id="workflow-financed-card" class="canva-card rounded-2xl border p-5"><span class="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-[#e9ddd0] text-sm font-bold text-[#10231e]">03</span>
+        <h3 data-template-id="workflow-financed-title" class="canva-text mt-7 text-xl font-bold"></h3>
+        <p data-template-id="workflow-financed-text" class="canva-text mt-3 text-sm leading-6 text-[#587169]"></p>
+       </article>
+       <article data-template-id="workflow-settled-card" class="canva-card rounded-2xl border p-5"><span class="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-[#e7684f] text-sm font-bold text-white">04</span>
+        <h3 data-template-id="workflow-settled-title" class="canva-text mt-7 text-xl font-bold"></h3>
+        <p data-template-id="workflow-settled-text" class="canva-text mt-3 text-sm leading-6 text-[#587169]"></p>
+       </article>
+      </div>
+     </div>
+    </section>
+    <section id="finance" class="w-full bg-[#e8ede3] px-5 py-20 lg:px-8 lg:py-28">
+     <div class="mx-auto grid max-w-7xl gap-12 lg:grid-cols-[.94fr_1.06fr] lg:items-center">
+      <div>
+       <p data-template-id="finance-eyebrow" class="canva-text text-xs font-bold uppercase tracking-[0.16em]"></p>
+       <h2 data-template-id="finance-title" class="canva-text display-face mt-4 max-w-xl text-4xl font-semibold leading-tight tracking-[-0.04em] sm:text-5xl"></h2>
+       <p data-template-id="finance-description" class="canva-text mt-6 max-w-xl text-lg leading-8 text-[#587169]"></p><a href="#demo-preview" data-template-id="finance-link" class="canva-link focus-ring mt-7 inline-flex items-center gap-2 rounded-lg font-bold underline decoration-2 underline-offset-4"> <span data-template-id="finance-link-text" class="canva-text"></span> <i data-lucide="arrow-right" class="h-4 w-4" aria-hidden="true"></i> </a>
+      </div>
+      <div class="rounded-[1.8rem] bg-[#10231e] p-5 text-white sm:p-7">
+       <div class="flex items-start justify-between gap-4">
+        <div>
+         <p data-template-id="queue-label" class="canva-text text-xs font-bold uppercase tracking-[0.15em]"></p>
+         <h3 data-template-id="queue-title" class="canva-text mt-2 text-2xl font-bold"></h3>
+        </div><span data-template-id="queue-count" class="canva-tag rounded-full px-3 py-1.5 text-sm font-bold"></span>
+       </div>
+       <div class="mt-7 space-y-3">
+        <div class="flex items-center justify-between rounded-xl bg-white/[0.08] p-4">
+         <div class="flex items-center gap-3"><span class="h-2.5 w-2.5 rounded-full bg-[#d6f45a]"></span>
+          <div>
+           <p data-template-id="queue-ready-title" class="canva-text text-sm font-bold"></p>
+           <p data-template-id="queue-ready-note" class="canva-text mt-1 text-xs text-white/60"></p>
+          </div>
+         </div>
+         <p data-template-id="queue-ready-value" class="canva-text text-sm font-bold"></p>
+        </div>
+        <div class="flex items-center justify-between rounded-xl bg-white/[0.08] p-4">
+         <div class="flex items-center gap-3"><span class="h-2.5 w-2.5 rounded-full bg-[#e7684f]"></span>
+          <div>
+           <p data-template-id="queue-gap-title" class="canva-text text-sm font-bold"></p>
+           <p data-template-id="queue-gap-note" class="canva-text mt-1 text-xs text-white/60"></p>
+          </div>
+         </div>
+         <p data-template-id="queue-gap-value" class="canva-text text-sm font-bold"></p>
+        </div>
+       </div>
+      </div>
+     </div>
+    </section>
+    <section id="evidence" class="w-full px-5 py-20 lg:px-8 lg:py-28">
+     <div class="mx-auto max-w-7xl">
+      <div class="mb-12 max-w-2xl">
+       <p data-template-id="evidence-eyebrow" class="canva-text text-xs font-bold uppercase tracking-[0.16em]"></p>
+       <h2 data-template-id="evidence-title" class="canva-text display-face mt-4 text-4xl font-semibold leading-tight tracking-[-0.04em] sm:text-5xl"></h2>
+      </div>
+      <div class="grid gap-5 md:grid-cols-3">
+       <article data-template-id="evidence-card-one" class="canva-card feature-card rounded-2xl border p-7">
+        <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-[#d6f45a] text-[#10231e]">
+         <i data-lucide="clipboard-check" aria-hidden="true"></i>
+        </div>
+        <h3 data-template-id="evidence-card-one-title" class="canva-text mt-7 text-2xl font-bold"></h3>
+        <p data-template-id="evidence-card-one-text" class="canva-text mt-3 text-sm leading-6 text-[#587169]"></p>
+       </article>
+       <article data-template-id="evidence-card-two" class="canva-card feature-card rounded-2xl border p-7">
+        <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-[#1d4c3b] text-[#d6f45a]">
+         <i data-lucide="indian-rupee" aria-hidden="true"></i>
+        </div>
+        <h3 data-template-id="evidence-card-two-title" class="canva-text mt-7 text-2xl font-bold"></h3>
+        <p data-template-id="evidence-card-two-text" class="canva-text mt-3 text-sm leading-6 text-[#587169]"></p>
+       </article>
+       <article data-template-id="evidence-card-three" class="canva-card feature-card rounded-2xl border p-7">
+        <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-[#e9ddd0] text-[#10231e]">
+         <i data-lucide="scale" aria-hidden="true"></i>
+        </div>
+        <h3 data-template-id="evidence-card-three-title" class="canva-text mt-7 text-2xl font-bold"></h3>
+        <p data-template-id="evidence-card-three-text" class="canva-text mt-3 text-sm leading-6 text-[#587169]"></p>
+       </article>
+      </div>
+     </div>
+    </section>
+    <section id="demo-preview" class="preview-hidden w-full bg-[#10231e] px-5 py-16 lg:px-8 lg:py-20" aria-live="polite">
+     <div class="mx-auto max-w-7xl">
+      <div class="mb-8 flex flex-wrap items-end justify-between gap-5">
+       <div>
+        <p data-template-id="preview-eyebrow" class="canva-text text-xs font-bold uppercase tracking-[0.16em]"></p>
+        <h2 data-template-id="preview-title" class="canva-text display-face mt-3 text-4xl font-semibold tracking-[-0.04em]"></h2>
+       </div><button id="hide-preview-button" type="button" data-template-id="hide-preview-button" class="canva-button focus-ring rounded-xl border px-4 py-2.5 text-sm font-bold transition hover:bg-white/10"></button>
+      </div>
+      <div class="grid gap-5 lg:grid-cols-[1.45fr_.55fr]">
+       <div data-template-id="preview-panel" class="canva-panel overflow-hidden rounded-2xl p-5 sm:p-7">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+         <div>
+          <p data-template-id="preview-panel-title" class="canva-text text-lg font-bold"></p>
+          <p data-template-id="preview-panel-subtitle" class="canva-text mt-1 text-sm"></p>
+         </div><span data-template-id="preview-panel-tag" class="canva-tag rounded-full px-3 py-1 text-xs font-bold"></span>
+        </div>
+        <div class="mt-6 overflow-x-auto">
+         <table class="w-full min-w-[560px] text-left text-sm">
+          <thead>
+           <tr class="border-b border-[#10231e]/10">
+            <th data-template-id="table-head-invoice" class="canva-text pb-3 pr-4 text-xs font-bold uppercase tracking-wide"></th>
+            <th data-template-id="table-head-buyer" class="canva-text pb-3 pr-4 text-xs font-bold uppercase tracking-wide"></th>
+            <th data-template-id="table-head-age" class="canva-text pb-3 pr-4 text-xs font-bold uppercase tracking-wide"></th>
+            <th data-template-id="table-head-amount" class="canva-text pb-3 text-right text-xs font-bold uppercase tracking-wide"></th>
+           </tr>
+          </thead>
+          <tbody>
+           <tr class="border-b border-[#10231e]/10">
+            <td data-template-id="table-one-invoice" class="canva-text py-4 pr-4 font-bold"></td>
+            <td data-template-id="table-one-buyer" class="canva-text py-4 pr-4"></td>
+            <td data-template-id="table-one-age" class="canva-text py-4 pr-4"></td>
+            <td data-template-id="table-one-amount" class="canva-text py-4 text-right font-bold"></td>
+           </tr>
+           <tr>
+            <td data-template-id="table-two-invoice" class="canva-text py-4 pr-4 font-bold"></td>
+            <td data-template-id="table-two-buyer" class="canva-text py-4 pr-4"></td>
+            <td data-template-id="table-two-age" class="canva-text py-4 pr-4"></td>
+            <td data-template-id="table-two-amount" class="canva-text py-4 text-right font-bold"></td>
+           </tr>
+          </tbody>
+         </table>
+        </div>
+       </div>
+       <aside data-template-id="preview-side-panel" class="canva-panel rounded-2xl p-6"><i data-lucide="sparkles" class="h-6 w-6" aria-hidden="true"></i>
+        <p data-template-id="preview-side-label" class="canva-text mt-8 text-xs font-bold uppercase tracking-[0.15em]"></p>
+        <p data-template-id="preview-side-value" class="canva-text mt-2 text-3xl font-bold"></p>
+        <p data-template-id="preview-side-text" class="canva-text mt-4 text-sm leading-6"></p>
+       </aside>
+      </div>
+     </div>
+    </section>
+    <section id="claims" class="w-full bg-[#f0d8cb] px-5 py-20 lg:px-8 lg:py-28">
+     <div class="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[.8fr_1.2fr] lg:items-center">
+      <div>
+       <p data-template-id="claims-eyebrow" class="canva-text text-xs font-bold uppercase tracking-[0.16em]"></p>
+       <h2 data-template-id="claims-title" class="canva-text display-face mt-4 text-4xl font-semibold leading-tight tracking-[-0.04em] sm:text-5xl"></h2>
+      </div>
+      <div>
+       <p data-template-id="claims-description" class="canva-text text-lg leading-8 text-[#684839]"></p>
+       <div class="mt-7 flex items-center gap-3"><span class="flex h-10 w-10 items-center justify-center rounded-full bg-[#10231e] text-[#d6f45a]"><i data-lucide="folder-check" class="h-5 w-5" aria-hidden="true"></i></span>
+        <p data-template-id="claims-note" class="canva-text font-bold"></p>
+       </div>
+      </div>
+     </div>
+    </section>
+    <section class="w-full px-5 py-20 lg:px-8">
+     <div class="mx-auto max-w-7xl">
+      <p data-template-id="testimonial-eyebrow" class="canva-text text-center text-xs font-bold uppercase tracking-[0.16em]"></p>
+      <div class="mt-10 grid gap-5 md:grid-cols-2">
+       <figure data-template-id="testimonial-one-card" class="canva-card rounded-2xl border p-7">
+        <blockquote data-template-id="testimonial-one-quote" class="canva-text display-face text-2xl leading-snug tracking-[-0.025em]"></blockquote>
+        <figcaption class="mt-7 flex items-center gap-3"><img data-template-id="testimonial-one-image" loading="lazy" class="canva-image h-12 w-12 rounded-full object-cover">
+         <div>
+          <p data-template-id="testimonial-one-name" class="canva-text text-sm font-bold"></p>
+          <p data-template-id="testimonial-one-role" class="canva-text mt-1 text-xs text-[#587169]"></p>
+         </div>
+        </figcaption>
+       </figure>
+       <figure data-template-id="testimonial-two-card" class="canva-card rounded-2xl border p-7">
+        <blockquote data-template-id="testimonial-two-quote" class="canva-text display-face text-2xl leading-snug tracking-[-0.025em]"></blockquote>
+        <figcaption class="mt-7 flex items-center gap-3"><img data-template-id="testimonial-two-image" loading="lazy" class="canva-image h-12 w-12 rounded-full object-cover">
+         <div>
+          <p data-template-id="testimonial-two-name" class="canva-text text-sm font-bold"></p>
+          <p data-template-id="testimonial-two-role" class="canva-text mt-1 text-xs text-[#587169]"></p>
+         </div>
+        </figcaption>
+       </figure>
+      </div>
+     </div>
+    </section>
+    <section class="w-full px-5 pb-20 lg:px-8">
+     <div data-template-id="closing-banner" class="canva-banner mx-auto max-w-7xl overflow-hidden rounded-[2rem] p-8 sm:p-12 lg:flex lg:items-end lg:justify-between">
+      <div class="max-w-2xl">
+       <p data-template-id="closing-eyebrow" class="canva-text text-xs font-bold uppercase tracking-[0.16em]"></p>
+       <h2 data-template-id="closing-title" class="canva-text display-face mt-4 text-4xl font-semibold leading-tight tracking-[-0.04em] sm:text-5xl"></h2>
+      </div><button id="closing-demo-button" type="button" data-template-id="closing-demo-button" class="canva-button focus-ring mt-7 rounded-xl px-6 py-3.5 font-bold transition hover:-translate-y-0.5 lg:mt-0"></button>
+     </div>
+    </section>
+   </main>
+   <footer class="w-full border-t border-[#10231e]/10 px-5 py-8 lg:px-8">
+    <div class="mx-auto flex max-w-7xl flex-col justify-between gap-3 text-sm sm:flex-row">
+     <p data-template-id="footer-copy" class="canva-text text-[#587169]"></p>
+     <p data-template-id="footer-note" class="canva-text font-medium text-[#31564b]"></p>
+    </div>
+   </footer>
+  </div>
+  <script src="/_sdk/0aac212797dcb9a6.editing_sdk.js" integrity="sha512-U1Z5TGB/MTX0fFSADhP7rVM3+UzJJjKTapiY1vm1cxcbcyWo4eBuCJNJO6zARJ5kHopP9UvWNtPszOqzRc1ICA=="></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      lucide.createIcons();
+
+      const mobileMenuButton = document.getElementById("mobile-menu-button");
+      const mobileMenu = document.getElementById("mobile-menu");
+      const preview = document.getElementById("demo-preview");
+      const hidePreviewButton = document.getElementById("hide-preview-button");
+
+      mobileMenuButton.addEventListener("click", function () {
+        const expanded = mobileMenuButton.getAttribute("aria-expanded") === "true";
+        mobileMenuButton.setAttribute("aria-expanded", String(!expanded));
+        mobileMenu.classList.toggle("hidden", expanded);
+        mobileMenu.classList.toggle("mobile-nav-open", !expanded);
+      });
+
+      document.querySelectorAll("#mobile-menu a").forEach(function (link) {
+        link.addEventListener("click", function () {
+          mobileMenu.classList.add("hidden");
+          mobileMenu.classList.remove("mobile-nav-open");
+          mobileMenuButton.setAttribute("aria-expanded", "false");
+        });
+      });
+
+      function showPreview() {
+        preview.classList.remove("preview-hidden");
+        preview.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+
+      ["header-demo-button", "mobile-demo-button", "hero-demo-button", "closing-demo-button"].forEach(function (id) {
+        document.getElementById(id).addEventListener("click", showPreview);
+      });
+
+      hidePreviewButton.addEventListener("click", function () {
+        preview.classList.add("preview-hidden");
+      });
+    });
+  </script>
+ </body>
+</html>
