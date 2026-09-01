@@ -25,7 +25,7 @@ class PayKaro
 	/* Auth                                                              */
 	/* ================================================================== */
 
-	public function createUser( int $businessId, string $name, string $email, string $password = null, string $role = 'owner', string $provider = 'email', string $googleId = '', string $avatarUrl = '' ): int {
+	public function createUser( int $businessId, string $name, string $email, ?string $password = null, string $role = 'owner', string $provider = 'email', string $googleId = '', string $avatarUrl = '' ): int {
 		$hash = null === $password ? null : password_hash( $password, PASSWORD_DEFAULT );
 		$stmt = $this->db->prepare(
 			'INSERT INTO users (business_id,name,email,password,role,provider,google_id,avatar_url) VALUES (?,?,?,?,?,?,?,?)'
