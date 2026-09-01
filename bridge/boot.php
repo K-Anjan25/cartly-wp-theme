@@ -32,4 +32,13 @@ $_POST    = is_array( $ctx['post'] ?? null ) ? $ctx['post'] : array();
 $_COOKIE  = is_array( $ctx['cookies'] ?? null ) ? $ctx['cookies'] : array();
 $_REQUEST = array_merge( $_GET, $_POST );
 
+// The Node bridge forwards selected env vars so config.php's getenv() reads
+// (Google OAuth client id/secret, DSN) work inside the wasm PHP runtime.
+if ( is_array( $ctx['env'] ?? null ) ) {
+	foreach ( $ctx['env'] as $k => $v ) {
+		putenv( $k . '=' . $v );
+		$_ENV[ $k ] = $v;
+	}
+}
+
 require __DIR__ . '/../public/index.php';

@@ -25,19 +25,89 @@ class PayKaro
 	/* Auth                                                              */
 	/* ================================================================== */
 
-	public function createUser( int $businessId, string $name, string $email, string $password, string $role = 'owner' ): int {
-		$hash = password_hash( $password, PASSWORD_DEFAULT );
-		$stmt = $this->db->prepare( 'INSERT INTO users (business_id,name,email,password,role) VALUES (?,?,?,?,?)' );
-		$stmt->execute( array( $businessId, $name, $email, $hash, $role ) );
+	public function createUser( int $businessId, string $name, string $email, string $password = null, string $role = 'owner', string $provider = 'email', string $googleId = '', string $avatarUrl = '' ): int {
+		$hash = null === $password ? null : password_hash( $password, PASSWORD_DEFAULT );
+		$stmt = $this->db->prepare(
+			'INSERT INTO users (business_id,name,email,password,role,provider,google_id,avatar_url) VALUES (?,?,?,?,?,?,?,?)'
+		);
+		$stmt->execute( array( $businessId, $name, $email, $hash, $role, $provider, $googleId ?: null, $avatarUrl ?: null ) );
 		return (int) $this->db->lastInsertId();
+	}
+
+	/**
+	 * Sign-up: create a business (tenant) and its owner user together.
+	 * Returns the user row, or null if the email is already taken.
+	 */
+	public function registerBusiness( array $d ): ?array {
+		$email    = strtolower( trim( (string) ( $d['email'] ?? '' ) ) );
+		$name     = trim( (string) ( $d['name'] ?? '' ) );
+		$password = (string) ( $d['password'] ?? '' );
+		$bizName  = trim( (string) ( $d['business_name'] ?? '' ) );
+		if ( '' === $email || '' === $password ) {
+			return null;
+		}
+		if ( $this->userByEmail( $email ) ) {
+			return null; // email in use
+		}
+		$biz = $this->createBusiness( '' !== $bizName ? $bizName : $name );
+		$id  = $this->createUser( (int) $biz['id'], '' !== $name ? $name : 'Owner', $email, $password, 'owner' );
+		return $this->user( $id );
+	}
+
+	/** Find a user by email, or null. */
+	public function userByEmail( string $email ): ?array {
+		$stmt = $this->db->prepare( 'SELECT * FROM users WHERE email=?' );
+		$stmt->execute( array( strtolower( trim( $email ) ) ) );
+		return $stmt->fetch() ?: null;
+	}
+
+	/** Find a user by their Google subject id, or null. */
+	public function userByGoogleId( string $googleId ): ?array {
+		$stmt = $this->db->prepare( 'SELECT * FROM users WHERE google_id=? AND provider=\'google\'' );
+		$stmt->execute( array( $googleId ) );
+		return $stmt->fetch() ?: null;
+	}
+
+	/**
+	 * Match or provision a user from a Google profile.
+	 *
+	 * Link order:
+	 *  1. existing user whose google_id matches;
+	 *  2. existing user with the same email (attach google_id to it);
+	 *  3. otherwise create a business + owner.
+	 * Returns the user row, or null on invalid input.
+	 */
+	public function findOrCreateGoogleUser( array $profile ): ?array {
+		$googleId = (string) ( $profile['google_id'] ?? '' );
+		$email    = strtolower( trim( (string) ( $profile['email'] ?? '' ) ) );
+		$name     = trim( (string) ( $profile['name'] ?? '' ) );
+		$avatar   = (string) ( $profile['avatar_url'] ?? '' );
+		if ( '' === $googleId || '' === $email ) {
+			return null;
+		}
+		// 1. By google_id.
+		$u = $this->userByGoogleId( $googleId );
+		if ( $u ) {
+			return $u;
+		}
+		// 2. Same email — link the google account.
+		$u = $this->userByEmail( $email );
+		if ( $u ) {
+			$stmt = $this->db->prepare( "UPDATE users SET provider='google', google_id=?, avatar_url=COALESCE(NULLIF(?, ''), avatar_url) WHERE id=?" );
+			$stmt->execute( array( $googleId, $avatar, (int) $u['id'] ) );
+			return $this->user( (int) $u['id'] );
+		}
+		// 3. Brand new — create a business + owner.
+		$biz = $this->createBusiness( '' !== $name ? $name : 'My Business' );
+		$id  = $this->createUser( (int) $biz['id'], '' !== $name ? $name : 'Owner', $email, null, 'owner', 'google', $googleId, $avatar );
+		return $this->user( $id );
 	}
 
 	/** Find a user by email + verify password. Returns user row or null. */
 	public function authenticate( string $email, string $password ): ?array {
-		$stmt = $this->db->prepare( 'SELECT * FROM users WHERE email=?' );
-		$stmt->execute( array( $email ) );
-		$u = $stmt->fetch();
-		if ( ! $u || ! password_verify( $password, $u['password'] ) ) {
+		$u = $this->userByEmail( $email );
+		// OAuth-only users have a NULL password and cannot sign in via the form.
+		if ( ! $u || null === $u['password'] || ! password_verify( $password, $u['password'] ) ) {
 			return null;
 		}
 		return $u;
@@ -71,6 +141,28 @@ class PayKaro
 
 	public function destroySession( string $token ): void {
 		$this->db->prepare( 'DELETE FROM sessions WHERE token=?' )->execute( array( $token ) );
+	}
+
+	/** Store a one-time OAuth CSRF state with a short TTL (20 minutes). */
+	public function storeOAuthState( string $state ): void {
+		$expires = date( 'Y-m-d H:i:s', time() + 20 * 60 );
+		$this->db->prepare( 'INSERT INTO oauth_states (state,expires_at) VALUES (?,?)' )->execute( array( $state, $expires ) );
+		// Garbage collect expired states.
+		$this->db->prepare( 'DELETE FROM oauth_states WHERE expires_at < datetime(\'now\')' )->execute();
+	}
+
+	/**
+	 * Validate and consume a one-time OAuth CSRF state.
+	 * Returns true (and deletes it) if it exists and hasn't expired.
+	 */
+	public function consumeOAuthState( string $state ): bool {
+		$stmt = $this->db->prepare( "SELECT 1 FROM oauth_states WHERE state=? AND expires_at >= datetime('now')" );
+		$stmt->execute( array( $state ) );
+		if ( ! $stmt->fetch() ) {
+			return false;
+		}
+		$this->db->prepare( 'DELETE FROM oauth_states WHERE state=?' )->execute( array( $state ) );
+		return true;
 	}
 
 	public function user( int $id ): ?array {
@@ -260,6 +352,30 @@ class PayKaro
 		$this->seedEvidences( $id );
 		$this->createAlerts( $id );
 		return $id;
+	}
+
+	/** Update an existing (tenant-owned) invoice. Returns true on success. */
+	public function updateInvoice( int $id, array $d ): bool {
+		$inv = $this->invoice( $id );
+		if ( ! $inv ) {
+			return false;
+		}
+		$base = (float) ( $d['base_amount'] ?? $inv['base_amount'] );
+		$tax  = (float) ( $d['tax_amount'] ?? ( $base * $this->config['default_tax_rate'] / 100 ) );
+		$total = $base + $tax;
+		$date = $d['invoice_date'] ?? $inv['invoice_date'];
+		$due  = $this->addDays( $date, (int) $this->config['msme_due_days'] );
+		$stmt = $this->db->prepare(
+			'UPDATE invoices SET number=?, buyer_id=?, invoice_date=?, due_date=?, base_amount=?, tax_amount=?, total_amount=?, notes=? WHERE id=? AND business_id=?'
+		);
+		$stmt->execute( array(
+			$d['number'] ?? $inv['number'],
+			(int) ( $d['buyer_id'] ?? $inv['buyer_id'] ),
+			$date, $due, $base, $tax, $total,
+			$d['notes'] ?? $inv['notes'],
+			$id, $this->tid(),
+		) );
+		return true;
 	}
 
 	private function seedEvidences( int $id ): void {
