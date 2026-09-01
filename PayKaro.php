@@ -262,6 +262,30 @@ class PayKaro
 		return $id;
 	}
 
+	/** Update an existing (tenant-owned) invoice. Returns true on success. */
+	public function updateInvoice( int $id, array $d ): bool {
+		$inv = $this->invoice( $id );
+		if ( ! $inv ) {
+			return false;
+		}
+		$base = (float) ( $d['base_amount'] ?? $inv['base_amount'] );
+		$tax  = (float) ( $d['tax_amount'] ?? ( $base * $this->config['default_tax_rate'] / 100 ) );
+		$total = $base + $tax;
+		$date = $d['invoice_date'] ?? $inv['invoice_date'];
+		$due  = $this->addDays( $date, (int) $this->config['msme_due_days'] );
+		$stmt = $this->db->prepare(
+			'UPDATE invoices SET number=?, buyer_id=?, invoice_date=?, due_date=?, base_amount=?, tax_amount=?, total_amount=?, notes=? WHERE id=? AND business_id=?'
+		);
+		$stmt->execute( array(
+			$d['number'] ?? $inv['number'],
+			(int) ( $d['buyer_id'] ?? $inv['buyer_id'] ),
+			$date, $due, $base, $tax, $total,
+			$d['notes'] ?? $inv['notes'],
+			$id, $this->tid(),
+		) );
+		return true;
+	}
+
 	private function seedEvidences( int $id ): void {
 		$config = $this->config;
 		$all    = array_values( array_unique( array_merge( $config['required_evidence'], array( 'contract' ) ) ) );

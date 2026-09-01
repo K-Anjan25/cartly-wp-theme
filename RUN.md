@@ -58,10 +58,22 @@ One-click demo logins: `/login?demo=1` (Sunita) and `/login?demo=2` (Farhan).
 
 ## Routes
 
-- `/` overview/dashboard, `/invoices`, `/invoices/new`, `/invoice?id=N`, `/claim?id=N`
+- `/` overview/dashboard (public visitors see the landing page), `/invoices`, `/invoices/new`, `/invoice?id=N`, `/invoice?edit=N`, `/claim?id=N`
 - `/buyers`, `/buyers/new`
 - `/treds` finance queue, `/reports`, `/settings`
-- `/login`, `/logout` (POST)
+- `/pricing` public pricing page (also reachable from the sidebar "Upgrade to Pro" / "See pricing" card)
+- `/login`, `/logout` (POST), `/alerts/read` (POST — dismisses the dashboard "Needs attention" list)
+
+## Sandbox seed helper
+
+If PHP isn't installed on the host, seed the demo database through the bridge
+instead of `php bin/seed.php`:
+
+```bash
+cd bridge
+npm install
+VITEST=1 node seed.mjs   # idempotent; writes data/paykaro.sqlite
+```
 
 ## Layout
 

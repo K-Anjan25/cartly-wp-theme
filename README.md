@@ -33,10 +33,12 @@ remain.
 
 - **Backend:** PHP 8.3, PDO (SQLite for the zero-config demo; points at MySQL via
   `PAYKARO_DB_DSN`).
-- **Frontend:** server-rendered HTML with the self-contained **Northstar** design
-  system (`public/assets/app.css`) — responsive + dark mode.
+- **Frontend:** server-rendered HTML with a self-contained design system
+  (`public/assets/app.css`) — an editorial "ink & paper" theme (DM Sans / Fraunces,
+  moss + lime) matching `design.html`, responsive + light/dark modes.
 - **Bridge (sandbox):** `bridge/serve.mjs` runs the PHP app inside
-  `@php-wasm/node`, translating HTTP ↔ PHP superglobals.
+  `@php-wasm/node`, translating HTTP ↔ PHP superglobals. `bridge/seed.mjs` seeds
+  the SQLite demo DB when no native PHP is available.
 
 ## Run
 
@@ -51,8 +53,9 @@ schema.sql         businesses, users, sessions, buyers, invoices,
                    invoice_evidences, payments, financing, disputes, alerts
 PayKaro.php        domain service: auth + tenant scoping + rules
 bin/seed.php       install + idempotent seed (two tenants)
-public/index.php   web router + views (Northstar)
+public/index.php   web router + views (landing, login, pricing, app pages)
 public/assets/app.css
 bridge/serve.mjs   Node ↔ PHP bridge (sandbox)
+bridge/seed.mjs    seed runner for the sandbox (no native PHP needed)
 bridge/boot.php    superglobal bootstrap for the bridge
 ```
