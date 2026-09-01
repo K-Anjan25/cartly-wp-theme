@@ -66,6 +66,12 @@ if ( ! function_exists( 'paykaro_migrate' ) ) {
 		// 2. Make users.password nullable for OAuth-only users. SQLite can't ALTER
 		//    a column constraint, so rebuild the table when it is still NOT NULL.
 		if ( isset( $info['password'] ) && $info['password'] ) {
+			// Without legacy_alter_table, modern SQLite rewrites foreign keys in
+			// child tables (notably sessions) to reference the temporary name.
+			// That leaves existing databases pointing at _users_old after it is
+			// dropped and makes every login fail while creating a session.
+			$pdo->exec( 'PRAGMA foreign_keys = OFF' );
+			$pdo->exec( 'PRAGMA legacy_alter_table = ON' );
 			$pdo->exec( "ALTER TABLE users RENAME TO _users_old" );
 			$pdo->exec(
 				'CREATE TABLE users (
@@ -89,6 +95,48 @@ if ( ! function_exists( 'paykaro_migrate' ) ) {
 			$pdo->exec( 'DROP TABLE _users_old' );
 			$pdo->exec( 'CREATE INDEX IF NOT EXISTS idx_users_email ON users(email)' );
 			$pdo->exec( 'CREATE INDEX IF NOT EXISTS idx_users_google_id ON users(google_id)' );
+			$pdo->exec( 'PRAGMA legacy_alter_table = OFF' );
+			$pdo->exec( 'PRAGMA foreign_keys = ON' );
+		}
+
+		// Repair databases migrated by older releases. SQLite rewrote the
+		// sessions foreign key to `_users_old` when users was renamed, then that
+		// table was dropped. Rebuild only the affected table and retain sessions.
+		$brokenSessionsFk = false;
+		$hasSessions      = $pdo->query( "SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name='sessions'" )->fetchColumn();
+		if ( $hasSessions ) {
+			foreach ( $pdo->query( 'PRAGMA foreign_key_list(sessions)' )->fetchAll() as $fk ) {
+				if ( 'user_id' === (string) $fk['from'] && 'users' !== (string) $fk['table'] ) {
+					$brokenSessionsFk = true;
+					break;
+				}
+			}
+		}
+		if ( $brokenSessionsFk ) {
+			$pdo->exec( 'PRAGMA foreign_keys = OFF' );
+			try {
+				$pdo->beginTransaction();
+				$pdo->exec( 'ALTER TABLE sessions RENAME TO _sessions_broken' );
+				$pdo->exec(
+					'CREATE TABLE sessions (
+						token TEXT PRIMARY KEY,
+						user_id INTEGER NOT NULL,
+						created_at TEXT NOT NULL DEFAULT (datetime(\'now\')),
+						expires_at TEXT NOT NULL,
+						FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+					)'
+				);
+				$pdo->exec( 'INSERT INTO sessions (token,user_id,created_at,expires_at) SELECT token,user_id,created_at,expires_at FROM _sessions_broken' );
+				$pdo->exec( 'DROP TABLE _sessions_broken' );
+				$pdo->commit();
+			} catch ( Throwable $e ) {
+				if ( $pdo->inTransaction() ) {
+					$pdo->rollBack();
+				}
+				throw $e;
+			} finally {
+				$pdo->exec( 'PRAGMA foreign_keys = ON' );
+			}
 		}
 
 		// 3. oauth_states (one-time CSRF state).
