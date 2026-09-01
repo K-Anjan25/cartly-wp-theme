@@ -54,7 +54,7 @@ The bridge listens on `0.0.0.0:8080`. It:
 | Sunita Rao | `sunita@shreeprecision.in` | `demo1234` | Shree Precision (tenant 1) |
 | Farhan Ali | `farhan@metrowceramics.in` | `demo1234` | MetRow Ceramics (tenant 2) |
 
-One-click demo logins: `/login?demo=1` (Sunita) and `/login?demo=2` (Farhan).
+Sign in at `/login` with one of these test accounts to explore the app.
 
 ## Routes
 

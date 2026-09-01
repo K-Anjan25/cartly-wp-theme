@@ -80,7 +80,7 @@ never diverge. A user opening a URL for another business's invoice gets
 | Sunita Rao | `sunita@shreeprecision.in` | Shree Precision Components | 1 |
 | Farhan Ali | `farhan@metrowceramics.in` | MetRow Ceramics | 2 |
 
-Both use password `demo1234`. One-click links: `/login?demo=1` and `/login?demo=2`.
+Both use password `demo1234`. Sign in at `/login` with one of these test accounts.
 
 ## Run
 

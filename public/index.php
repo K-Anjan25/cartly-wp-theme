@@ -332,13 +332,6 @@ function loginPage( array $config ): string {
 		.pk-input:focus{outline:none;border-color:#1d4c3b;box-shadow:0 0 0 3px #eaf9b8;}
 		.pk-cta{width:100%;display:inline-flex;align-items:center;justify-content:center;border-radius:12px;padding:.7rem 1rem;font-size:.92rem;font-weight:700;border:0;cursor:pointer;background:#d6f45a;color:#10231e;transition:transform .15s,filter .15s;box-shadow:0 10px 22px rgba(214,244,90,.4);}
 		.pk-cta:hover{transform:translateY(-1px);filter:brightness(.97);}
-		.pk-demo-sep{margin-top:1.6rem;border-top:1px dashed rgba(16,35,30,.15);padding-top:1.2rem;}
-		.pk-demohdr{font-size:.74rem;color:#587169;margin-bottom:.6rem;font-weight:600;}
-		.pk-demo{display:flex;align-items:center;gap:.7rem;border:1px solid rgba(16,35,30,.15);background:#fffdf6;color:var(--n-ink);border-radius:12px;padding:.6rem .85rem;font-size:.85rem;font-weight:600;text-decoration:none;margin-bottom:.5rem;transition:all .15s;box-shadow:0 1px 2px rgba(16,35,30,.05);}
-		.pk-demo:hover{border-color:#1d4c3b;color:#1d4c3b;transform:translateY(-1px);}
-		.pk-demo .arrow{margin-left:auto;color:#7c8f86;}
-		.pk-demo-note{font-size:.74rem;color:#7c8f86;margin-top:.7rem;}
-		.pk-demo-note code{background:#f1efe6;padding:.1rem .4rem;border-radius:6px;}
 		.pk-err{background:#f9e0d8;border-left:4px solid #e7684f;border-radius:0 12px 12px 0;padding:.75rem 1rem;font-size:.85rem;color:#10231e;margin-bottom:1.1rem;}
 		@media (max-width:940px){.pk-authbrand{display:none;}.pk-formside{padding:2rem 1.3rem;}}
 	</style></head>
@@ -373,20 +366,13 @@ function loginPage( array $config ): string {
 				<h1 class="pk-heading">Welcome back</h1>
 				<p class="pk-sub">Sign in to your workspace. Each user sees only their own business's receivables.</p>
 
-				<?php if ( ! empty( $_GET['err'] ) ) : ?><div class="pk-err">Invalid email or password. Try the demo logins below.</div><?php endif; ?>
+				<?php if ( ! empty( $_GET['err'] ) ) : ?><div class="pk-err">Invalid email or password. Please check your details and try again.</div><?php endif; ?>
 
 				<form method="post" action="/login">
 					<label class="pk-label">Email</label><input class="pk-input" type="email" name="email" required placeholder="you@company.in" autofocus>
 					<label class="pk-label">Password</label><input class="pk-input" type="password" name="password" required placeholder="••••••••">
 					<button class="pk-cta" type="submit">Sign in →</button>
 				</form>
-
-				<div class="pk-demo-sep">
-					<div class="pk-demohdr">Demo logins — one click:</div>
-					<a class="pk-demo" href="/login?demo=1"><span>Sunita · Shree Precision</span><span class="arrow">→</span></a>
-					<a class="pk-demo" href="/login?demo=2"><span>Farhan · MetRow Ceramics</span><span class="arrow">→</span></a>
-					<p class="pk-demo-note">Password: <code>demo1234</code></p>
-				</div>
 			</div>
 		</div>
 	</div>
@@ -614,7 +600,7 @@ function landingPage( array $config ): string {
 				<div class="mx-auto max-w-7xl">
 					<div class="mb-8 flex flex-wrap items-end justify-between gap-5">
 						<div><p class="text-xs font-bold uppercase tracking-[0.16em] text-[#d6f45a]">Live preview</p><h2 class="display-face mt-3 text-4xl font-semibold tracking-[-0.04em] text-white">A real receivables queue</h2></div>
-						<div class="flex items-center gap-2"><a href="/login?demo=1" class="focus-ring rounded-xl bg-[#d6f45a] px-4 py-2.5 text-sm font-bold text-[#10231e] transition hover:-translate-y-0.5">Open the full app →</a><button id="hide-preview-button" type="button" class="focus-ring rounded-xl border border-white/20 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-white/10">Hide</button></div>
+						<div class="flex items-center gap-2"><a href="/login" class="focus-ring rounded-xl bg-[#d6f45a] px-4 py-2.5 text-sm font-bold text-[#10231e] transition hover:-translate-y-0.5">Open the full app →</a><button id="hide-preview-button" type="button" class="focus-ring rounded-xl border border-white/20 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-white/10">Hide</button></div>
 					</div>
 					<div class="grid gap-5 lg:grid-cols-[1.45fr_.55fr]">
 						<div class="rounded-2xl bg-[#fffdf6] p-5 sm:p-7">
@@ -666,7 +652,7 @@ function landingPage( array $config ): string {
 						<p class="text-xs font-bold uppercase tracking-[0.16em] text-[#d6f45a]">Ready</p>
 						<h2 class="display-face mt-4 text-4xl font-semibold leading-tight tracking-[-0.04em] text-white sm:text-5xl">Make every invoice count.</h2>
 					</div>
-					<a href="/login?demo=1" class="focus-ring mt-7 inline-flex rounded-xl bg-[#d6f45a] px-6 py-3.5 font-bold text-[#10231e] transition hover:-translate-y-0.5 lg:mt-0">Try PayKaro free</a>
+					<a href="/login" class="focus-ring mt-7 inline-flex rounded-xl bg-[#d6f45a] px-6 py-3.5 font-bold text-[#10231e] transition hover:-translate-y-0.5 lg:mt-0">Try PayKaro free</a>
 				</div>
 			</section>
 		</main>
@@ -722,7 +708,7 @@ function pricingPage( array $config ): string {
 			'price' => 'Free',
 			'per' => 'forever',
 			'blurb' => 'For a single MSME getting its receivables in order.',
-			'cta' => '/login?demo=1',
+			'cta' => '/login',
 			'cta_label' => 'Start free',
 			'highlight' => false,
 			'features' => array( 'Up to 25 invoices', '1 user (owner)', 'Invoice pipeline + interest', 'Evidence checklist', 'Demo data included' ),
@@ -732,7 +718,7 @@ function pricingPage( array $config ): string {
 			'price' => '₹1,499',
 			'per' => '/month · per business',
 			'blurb' => 'For growing suppliers who finance and claim often.',
-			'cta' => '/login?demo=1',
+			'cta' => '/login',
 			'cta_label' => 'Try Pro free',
 			'highlight' => true,
 			'features' => array( 'Unlimited invoices', '3 users (owner + accountant)', 'TReDS / finance queue', 'MSEFC claim packet builder', 'Advanced reports & export', 'Priority support' ),
@@ -742,7 +728,7 @@ function pricingPage( array $config ): string {
 			'price' => 'Custom',
 			'per' => 'let’s talk',
 			'blurb' => 'For CA firms, lenders and multi-entity groups.',
-			'cta' => '/login?demo=1',
+			'cta' => '/login',
 			'cta_label' => 'Book a demo',
 			'highlight' => false,
 			'features' => array( 'Everything in Pro', 'Multi-entity / portfolio view', 'API & data exports', 'Onboarding & training', 'Dedicated success manager' ),
@@ -826,7 +812,7 @@ function pricingPage( array $config ): string {
 					</div>
 					<div class="mt-14 flex flex-col items-center gap-3 border-t border-[#10231e]/10 pt-10 text-center">
 						<p class="display-face text-2xl font-semibold tracking-[-0.03em]">Not sure which plan?</p>
-						<p class="max-w-xl text-[#587169]">Start free with the demo to see how your receivables look today — <a class="focus-ring rounded font-bold text-[#1d4c3b] underline decoration-2 underline-offset-4" href="/login?demo=1">login to Shree Precision</a> or <a class="focus-ring rounded font-bold text-[#1d4c3b] underline decoration-2 underline-offset-4" href="/login?demo=2">MetRow Ceramics</a>.</p>
+						<p class="max-w-xl text-[#587169]">Every plan starts on the free Starter tier — <a class="focus-ring rounded font-bold text-[#1d4c3b] underline decoration-2 underline-offset-4" href="/login">sign in</a> and track your first invoices today.</p>
 					</div>
 				</div>
 			</section>
@@ -1393,20 +1379,6 @@ if ( 'POST' === $method && '/logout' === $path ) {
 	$response['cookies'][] = array( COOKIE_NAME, '', 0 ); // expire
 	echo json_encode( $response );
 	exit;
-}
-
-// ---- One-click demo login ----
-if ( '/login' === $path && isset( $g['demo'] ) ) {
-	$email = '1' === $g['demo'] ? 'sunita@shreeprecision.in' : 'farhan@metrowceramics.in';
-	$u = $app->authenticate( $email, 'demo1234' );
-	if ( $u ) {
-		$token = $app->createSession( (int) $u['id'] );
-		$response['status']   = 302;
-		$response['location'] = '/';
-		$response['cookies'][] = array( COOKIE_NAME, $token, (int) $config['session_ttl'] );
-		echo json_encode( $response );
-		exit;
-	}
 }
 
 // ---- Public pages: '/' landing, '/login', '/pricing' are public ----
