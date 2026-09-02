@@ -5,3 +5,7 @@ node_modules/
 # PayKaro demo database
 *.sqlite
 data/*.sqlite
+
+# Scratch / search-result assets
+/image-search/
+/public/assets/img/*.tmp
