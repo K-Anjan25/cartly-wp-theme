@@ -156,7 +156,7 @@ function send(res, j) {
 
 function serveFile(res, filePath) {
 	const ext = path.extname(filePath).toLowerCase();
-	const types = { '.css': 'text/css; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.png': 'image/png', '.svg': 'image/svg+xml', '.ico': 'image/x-icon' };
+	const types = { '.css': 'text/css; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.webp': 'image/webp', '.svg': 'image/svg+xml', '.ico': 'image/x-icon' };
 	try {
 		const data = fs.readFileSync(filePath);
 		res.statusCode = 200;
