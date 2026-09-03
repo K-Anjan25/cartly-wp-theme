@@ -161,7 +161,8 @@ html.dark {
 .pkg-brand-text .sub { font-size:.7rem; color:var(--n-ink-mute); margin-top:.05rem; letter-spacing:.02em; }
 
 /* Primary nav (horizontal, text links) */
-.pkg-nav { display:flex; align-items:center; gap:.1rem; flex:1; min-width:0; overflow-x:auto; }
+.pkg-nav { display:flex; align-items:center; gap:.1rem; flex:1; min-width:0; overflow-x:auto; scrollbar-width:none; -ms-overflow-style:none; }
+.pkg-nav::-webkit-scrollbar { display:none; }
 .pkg-nav a {
 	padding:.5rem .9rem;
 	font-size:.88rem;
