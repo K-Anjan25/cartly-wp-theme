@@ -109,7 +109,7 @@ function money( $n ): string {
 		}
 		$s = $rest . ',' . $last3;
 	}
-	$out = '₹' . $neg . $s;
+	$out = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>' . $neg . $s;
 	if ( $dec > 0 ) {
 		$out .= '.' . str_pad( (string) $dec, 2, '0', STR_PAD_LEFT );
 	}
@@ -197,7 +197,7 @@ function healthBadge( array $i ): string {
 }
 
 // One KPI card.
-function kpiCard( string $label, string $value, string $trend = '', string $icon = '₹', string $tone = 'blue' ): string {
+function kpiCard( string $label, string $value, string $trend = '', string $icon = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>', string $tone = 'blue' ): string {
 	$trendHtml = $trend ? '<div class="pkg-kpi-trend">' . $trend . '</div>' : '<div class="pkg-kpi-trend" style="visibility:hidden">&nbsp;</div>';
 	return '<div class="pkg-card pkg-kpi"><div class="pkg-kpi-head"><div class="pkg-kpi-ico pkg-kpi-ico--' . $tone . '">' . $icon . '</div><div class="pkg-kpi-label">' . e( $label ) . '</div></div>'
 		. '<div class="pkg-kpi-value num">' . $value . '</div>'
@@ -237,18 +237,16 @@ function layout( array $config, string $title, string $content, string $active, 
 	<body class="pkg">
 	<div class="pkg-shell">
 
-		<!-- Utility bar (slate, small) -->
+			<!-- Utility bar (slate, small) -->
 		<div class="pkg-util">
 			<div class="pkg-util-inner">
 				<span class="pkg-util-tag"><span class="dot"></span> Demo workspace</span>
 				<span class="pkg-util-sep"></span>
 				<a class="pkg-util-hide" href="/pricing">Pricing</a>
 				<span class="pkg-util-sep"></span>
-				<a class="pkg-util-hide" href="#">Help</a>
+				<a class="pkg-util-hide" href="/help">Help</a>
 				<div class="pkg-util-right">
-					<a href="#">English (IN)</a>
-					<span class="pkg-util-sep"></span>
-					<a href="#">Contact</a>
+					<a href="/contact">Contact</a>
 					<span class="pkg-util-sep"></span>
 					<span class="pkg-util-hide">Welcome, <?php echo e( $b ); ?></span>
 				</div>
@@ -345,9 +343,9 @@ function loginPage( array $config ): string {
 				<div class="auth-headline">Turn invoice mess into<br>finance-ready receivables.</div>
 				<p class="auth-copy">One pipeline for every invoice — evidence complete, interest computed, and ready to finance or claim the moment it's overdue.</p>
 				<div class="auth-chips">
-					<span class="auth-chip">🔒 Multi-tenant secured</span>
-					<span class="auth-chip">⚙ TReDS-ready</span>
-					<span class="auth-chip">⏱ 45-day due window</span>
+					<span class="auth-chip"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> Multi-tenant secured</span>
+					<span class="auth-chip"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h.09a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v.09a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg> TReDS-ready</span>
+					<span class="auth-chip"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 45-day due window</span>
 				</div>
 			</div>
 			<div class="auth-foot">&copy; <?php echo e( $config['name'] ); ?> · demo</div>
@@ -410,9 +408,9 @@ function signupPage( array $config ): string {
 				<div class="auth-headline">Turn invoice mess into<br>finance-ready receivables.</div>
 				<p class="auth-copy">Create an account, add a buyer, and raise your first invoice in minutes. Your receivables, interest and evidence — all in one pipeline.</p>
 				<div class="auth-chips">
-					<span class="auth-chip">🔒 Multi-tenant secured</span>
-					<span class="auth-chip">⚙ TReDS-ready</span>
-					<span class="auth-chip">⏱ 45-day due window</span>
+					<span class="auth-chip"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> Multi-tenant secured</span>
+					<span class="auth-chip"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h.09a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v.09a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg> TReDS-ready</span>
+					<span class="auth-chip"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 45-day due window</span>
 				</div>
 			</div>
 			<div class="auth-foot">&copy; <?php echo e( $config['name'] ); ?> · demo</div>
@@ -473,7 +471,7 @@ function landingPage( array $config ): string {
 			<span class="pkg-util-sep"></span>
 			<a class="pkg-util-hide" href="/pricing">Pricing</a>
 			<div class="pkg-util-right">
-				<a href="#">English (IN)</a>
+				<a href="/contact">Contact</a>
 				<span class="pkg-util-sep"></span>
 				<a href="/login">Sign in</a>
 			</div>
@@ -815,15 +813,224 @@ function landingPage( array $config ): string {
 			<div>
 				<h4>Legal</h4>
 				<ul>
-					<li><a href="#">Terms</a></li>
-					<li><a href="#">Privacy</a></li>
-					<li><a href="#">Security</a></li>
+					<li><a href="/terms">Terms</a></li>
+					<li><a href="/privacy">Privacy</a></li>
+					<li><a href="/security">Security</a></li>
 				</ul>
 			</div>
 		</div>
 		<div class="page-footer-bottom">
 			<span>© <?php echo e( date( 'Y' ) ); ?> PayKaro · Turn invoice mess into finance-ready receivables.</span>
 			<span>Demo workspace · <a href="/login" style="color:var(--n-gold);">Sign in</a></span>
+		</div>
+	</footer>
+	</body>
+	</html>
+	<?php
+	return ob_get_clean();
+}
+
+/* Help page */
+function helpPage( array $config ): string {
+	ob_start();
+	?>
+	<!doctype html>
+	<html lang="en">
+	<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Help — <?php echo e( $config['name'] ); ?></title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="/assets/app.css">
+	</head>
+	<body class="page">
+	<div class="pkg-util">
+		<div class="pkg-util-inner">
+			<span class="pkg-util-tag"><span class="dot"></span> MSME receivables</span>
+			<div class="pkg-util-right">
+				<a href="/">Back to home</a>
+				<span class="pkg-util-sep"></span>
+				<a href="/login">Sign in</a>
+			</div>
+		</div>
+	</div>
+	<header class="pkg-head">
+		<div class="pkg-head-inner">
+			<div class="pkg-bars" aria-hidden="true">
+				<span class="bar-thick"></span>
+				<span class="bar-thin"></span>
+			</div>
+			<a class="pkg-brand" href="/" aria-label="PayKaro home">
+				<?php echo logoMark(); ?>
+				<div class="pkg-brand-text">
+					<div class="name"><?php echo brandWordmark(); ?></div>
+					<div class="sub">MSME invoice &amp; receivables tracker</div>
+				</div>
+			</a>
+			<nav class="pkg-nav" aria-label="Primary">
+				<a href="/#workflow">Workflow</a>
+				<a href="/#finance">Financing</a>
+				<a href="/#news">News</a>
+				<a href="/pricing">Pricing</a>
+			</nav>
+			<div class="pkg-head-right">
+				<a class="pbtn pbtn-outline pbtn-sm" href="/login">Sign in</a>
+				<a class="pbtn pbtn-primary pbtn-sm" href="/signup">Get started</a>
+			</div>
+		</div>
+		<div class="pkg-headline" aria-hidden="true"></div>
+	</header>
+	<main>
+		<section class="sec" style="padding:5rem 0 4rem;">
+			<div class="container">
+				<div class="sec-head" style="grid-template-columns:1fr;">
+					<div>
+						<p class="eyebrow">Support</p>
+						<h1 class="display" style="font-size:clamp(2rem,4vw,3rem);margin-top:.5rem;">How can we help you?</h1>
+					</div>
+				</div>
+				<div class="cards-row" style="grid-template-columns:repeat(3,1fr);margin-top:2rem;">
+					<article class="feature-card">
+						<div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H7a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7z"/><path d="M14 2v5h5"/><path d="M12 11v6M9 14h6"/></svg></div>
+						<h3>Getting started</h3>
+						<p>Learn how to set up your account, add your first buyer, and raise your first invoice in minutes.</p>
+					</article>
+					<article class="feature-card">
+						<div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 4 6v6c0 5 3.5 9.5 8 10 4.5-.5 8-5 8-10V6l-8-4z"/><path d="m9 12 2 2 4-4"/></svg></div>
+						<h3>TReDS &amp; Financing</h3>
+						<p>Understand how the finance queue works and how to get your invoices ready for TReDS financing.</p>
+					</article>
+					<article class="feature-card">
+						<div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+						<h3>Claims &amp; Disputes</h3>
+						<p>File MSEFC claims, start mediation, or build an evidence packet for arbitration.</p>
+					</article>
+				</div>
+				<div class="cta-banner" style="margin-top:3rem;">
+					<div>
+						<h2 style="font-family:var(--n-display);font-size:1.5rem;">Still need help?</h2>
+						<p>Contact our support team and we'll get back to you within 24 hours.</p>
+					</div>
+					<a class="pbtn pbtn-primary pbtn-lg" href="/contact">Contact support</a>
+				</div>
+			</div>
+		</section>
+	</main>
+	<footer class="page-footer">
+		<div class="page-footer-bottom">
+			<span>© <?php echo e( date( 'Y' ) ); ?> PayKaro</span>
+			<span><a href="/" style="color:var(--n-gold);">Back to home</a></span>
+		</div>
+	</footer>
+	</body>
+	</html>
+	<?php
+	return ob_get_clean();
+}
+
+/* Contact page */
+function contactPage( array $config ): string {
+	ob_start();
+	?>
+	<!doctype html>
+	<html lang="en">
+	<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Contact — <?php echo e( $config['name'] ); ?></title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="/assets/app.css">
+	</head>
+	<body class="page">
+	<div class="pkg-util">
+		<div class="pkg-util-inner">
+			<span class="pkg-util-tag"><span class="dot"></span> MSME receivables</span>
+			<div class="pkg-util-right">
+				<a href="/">Back to home</a>
+				<span class="pkg-util-sep"></span>
+				<a href="/login">Sign in</a>
+			</div>
+		</div>
+	</div>
+	<header class="pkg-head">
+		<div class="pkg-head-inner">
+			<div class="pkg-bars" aria-hidden="true">
+				<span class="bar-thick"></span>
+				<span class="bar-thin"></span>
+			</div>
+			<a class="pkg-brand" href="/" aria-label="PayKaro home">
+				<?php echo logoMark(); ?>
+				<div class="pkg-brand-text">
+					<div class="name"><?php echo brandWordmark(); ?></div>
+					<div class="sub">MSME invoice &amp; receivables tracker</div>
+				</div>
+			</a>
+			<nav class="pkg-nav" aria-label="Primary">
+				<a href="/#workflow">Workflow</a>
+				<a href="/#finance">Financing</a>
+				<a href="/#news">News</a>
+				<a href="/pricing">Pricing</a>
+			</nav>
+			<div class="pkg-head-right">
+				<a class="pbtn pbtn-outline pbtn-sm" href="/login">Sign in</a>
+				<a class="pbtn pbtn-primary pbtn-sm" href="/signup">Get started</a>
+			</div>
+		</div>
+		<div class="pkg-headline" aria-hidden="true"></div>
+	</header>
+	<main>
+		<section class="sec" style="padding:5rem 0 4rem;">
+			<div class="container">
+				<div class="split">
+					<div>
+						<p class="eyebrow">Get in touch</p>
+						<h1 class="display" style="font-size:clamp(2rem,4vw,3rem);margin-top:.5rem;">We'd love to hear from you</h1>
+						<p class="lede" style="margin-top:1.2rem;">Whether you have a question about features, pricing, need a demo, or anything else — our team is ready to answer all your questions.</p>
+						<div style="margin-top:2rem;">
+							<div class="feature-card" style="margin-bottom:1rem;">
+								<div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div>
+								<h3>Email</h3>
+								<p>support@paykaro.in</p>
+							</div>
+							<div class="feature-card" style="margin-bottom:1rem;">
+								<div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg></div>
+								<h3>Phone</h3>
+								<p>+91 98765 43210</p>
+							</div>
+						</div>
+					</div>
+					<div>
+						<div class="price-card" style="padding:2rem;">
+							<h2 style="font-family:var(--n-font);font-size:1.2rem;font-weight:700;margin-bottom:1.5rem;">Send us a message</h2>
+							<form method="post" action="/contact" style="display:flex;flex-direction:column;gap:1rem;">
+								<div class="pkg-field" style="margin:0;">
+									<label class="pkg-label">Your name</label>
+									<input class="pkg-input" type="text" name="name" placeholder="Full name" required>
+								</div>
+								<div class="pkg-field" style="margin:0;">
+									<label class="pkg-label">Work email</label>
+									<input class="pkg-input" type="email" name="email" placeholder="you@company.in" required>
+								</div>
+								<div class="pkg-field" style="margin:0;">
+									<label class="pkg-label">Message</label>
+									<textarea class="pkg-input pkg-textarea" name="message" placeholder="How can we help?" required style="min-height:8rem;"></textarea>
+								</div>
+								<button class="pbtn pbtn-primary pbtn-block" type="submit">Send message</button>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+	</main>
+	<footer class="page-footer">
+		<div class="page-footer-bottom">
+			<span>© <?php echo e( date( 'Y' ) ); ?> PayKaro</span>
+			<span><a href="/" style="color:var(--n-gold);">Back to home</a></span>
 		</div>
 	</footer>
 	</body>
@@ -1013,18 +1220,18 @@ function viewDashboard( PayKaro $app, array $config ): string {
 		. '<div class="pkg-pagehead">'
 		. '<div><h1 class="pkg-h1">Overview</h1><p class="pkg-sub">Here’s what’s happening with your receivables.</p></div>'
 		. '<div class="pkg-pagehead-actions">'
-		. '<span class="pkg-filter">📅 ' . e( $range ) . '</span>'
-		. '<span class="pkg-filter">⚙ Filters</span>'
+		. '<span class="pkg-filter"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> ' . e( $range ) . '</span>'
+		. '<span class="pkg-filter"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h.09a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v.09a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg> Filters</span>'
 		. '<a class="pkg-btn pkg-btn--sm pkg-btn--primary" href="/invoices/new">+ New Invoice</a>'
 		. '</div></div>';
 
 	// KPI cards.
 	$monthLabel = date( 'd M' ) . ' – ' . date( 'd M Y' );
 	$ob .= '<div class="pkg-grid pkg-grid--4">';
-	$ob .= kpiCard( 'Outstanding', money( $d['total'] ), '<span class="up">↗</span> 8.6% vs 01 Apr – 30 Apr 2025', '₹', 'blue' );
-	$ob .= kpiCard( 'Overdue', money( $d['overdue'] ), '<span class="down">↘</span> 12.3% vs 01 Apr – 30 Apr 2025', '⏳', 'red' );
-	$ob .= kpiCard( 'Interest', money( $d['interest'] ), '<span class="up">↗</span> 6.2% vs 01 Apr – 30 Apr 2025', '%', 'amber' );
-	$ob .= kpiCard( 'Receivable in 30d', money( $d['in30d'] ), '<span class="up">↗</span> 10.7% vs 01 Apr – 30 Apr 2025', '↗', 'blue' );
+	$ob .= kpiCard( 'Outstanding', money( $d['total'] ), '<span class="up"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg></span> 8.6% vs 01 Apr – 30 Apr 2025', '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>', 'blue' );
+	$ob .= kpiCard( 'Overdue', money( $d['overdue'] ), '<span class="down"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg></span> 12.3% vs 01 Apr – 30 Apr 2025', '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>', 'red' );
+	$ob .= kpiCard( 'Interest', money( $d['interest'] ), '<span class="up"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg></span> 6.2% vs 01 Apr – 30 Apr 2025', '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="19" y1="5" x2="5" y2="19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg>', 'amber' );
+	$ob .= kpiCard( 'Receivable in 30d', money( $d['in30d'] ), '<span class="up"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg></span> 10.7% vs 01 Apr – 30 Apr 2025', '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>', 'blue' );
 	$ob .= '</div>';
 
 	// Needs attention (alerts).
@@ -1120,7 +1327,7 @@ function viewDashboard( PayKaro $app, array $config ): string {
 	$ob .= '<div class="pkg-card pkg-tablewrap">';
 	$ob .= '<div class="pkg-cardhead"><h2 class="pkg-h2">Recent Invoices</h2>'
 		. '<div class="pkg-toolbar">'
-		. '<span class="pkg-search">🔍 <input placeholder="Search invoices…" aria-label="Search"></span>'
+		. '<span class="pkg-search"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg> <input placeholder="Search invoices…" aria-label="Search"></span>'
 		. '<a class="pkg-btn pkg-btn--sm" href="/invoices">Download</a>'
 		. '<a class="pkg-btn pkg-btn--sm pkg-btn--primary" href="/invoices/new">+ New Invoice</a>'
 		. '</div></div>';
@@ -1609,6 +1816,11 @@ if ( ! $user ) {
 	if ( '/' === $path ) { $response['body'] = landingPage( $config ); }
 	elseif ( '/pricing' === $path ) { $response['body'] = pricingPage( $config ); }
 	elseif ( '/signup' === $path ) { $response['body'] = signupPage( $config ); }
+	elseif ( '/help' === $path ) { $response['body'] = helpPage( $config ); }
+	elseif ( '/contact' === $path ) { $response['body'] = contactPage( $config ); }
+	elseif ( '/terms' === $path || '/privacy' === $path || '/security' === $path ) {
+		$response['body'] = helpPage( $config ); // Redirect to help for now
+	}
 	elseif ( '/auth/google' === $path || '/auth/google/callback' === $path ) {
 		$response['status']   = 302;
 		$response['location'] = '/login';
@@ -1684,6 +1896,13 @@ $content = ''; $title = $config['name']; $active = 'dashboard';
 		case '/treds': $title = 'Finance queue'; $active = 'treds'; $content = viewTreds( $app ); break;
 		case '/reports': $title = 'Reports'; $active = 'reports'; $content = viewReports( $app, $config ); break;
 		case '/settings': $title = 'Settings'; $active = 'settings'; $content = viewSettings( $app, $config ); break;
+		case '/help': $title = 'Help'; $active = 'help'; $content = helpPage( $config ); break;
+		case '/contact': $title = 'Contact'; $active = 'contact'; $content = contactPage( $config ); break;
+		case '/terms': case '/privacy': case '/security':
+			$response['status'] = 302;
+			$response['location'] = '/';
+			echo json_encode( $response );
+			exit;
 		case '/pricing': $title = 'Pricing'; $active = 'pricing'; $content = pricingPage( $config ); break;
 		default: $response['status'] = 404; $content = '<div class="pkg-card pkg-empty"><h2 class="pkg-h2">Not found</h2><a class="pkg-btn" href="/">Home</a></div>';
 	}
