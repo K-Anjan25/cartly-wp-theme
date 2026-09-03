@@ -93,6 +93,12 @@ function e( $s ): string {
 	return htmlspecialchars( (string) $s, ENT_QUOTES, 'UTF-8' );
 }
 
+/**
+ * Format a number as Indian-grouped rupees, e.g. 1234567 → "₹12,34,567".
+ * Pure text on purpose: callers wrap this in e() when rendering, so it must
+ * never contain markup (it used to embed an <svg> icon, which every e()
+ * call site rendered as literal escaped HTML).
+ */
 function money( $n ): string {
 	$n   = (float) $n;
 	$neg = $n < 0 ? '-' : '';
@@ -109,7 +115,7 @@ function money( $n ): string {
 		}
 		$s = $rest . ',' . $last3;
 	}
-	$out = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>' . $neg . $s;
+	$out = '₹' . $neg . $s;
 	if ( $dec > 0 ) {
 		$out .= '.' . str_pad( (string) $dec, 2, '0', STR_PAD_LEFT );
 	}
@@ -1912,11 +1918,19 @@ $content = ''; $title = $config['name']; $active = 'dashboard';
 		case '/treds': $title = 'Finance queue'; $active = 'treds'; $content = viewTreds( $app ); break;
 		case '/reports': $title = 'Reports'; $active = 'reports'; $content = viewReports( $app, $config ); break;
 		case '/settings': $title = 'Settings'; $active = 'settings'; $content = viewSettings( $app, $config ); break;
-		// Public pages - redirect logged-in users to standalone versions
+		// Public standalone pages — render the same full pages anonymous
+		// visitors get (they carry their own header/footer). Redirecting to
+		// $path itself would loop forever.
 		case '/help': case '/contact': case '/pricing':
 		case '/terms': case '/privacy': case '/security':
-			$response['status']   = 302;
-			$response['location'] = $path;
+			$response['status'] = 200;
+			if ( '/pricing' === $path ) {
+				$response['body'] = pricingPage( $config );
+			} elseif ( '/contact' === $path ) {
+				$response['body'] = contactPage( $config );
+			} else {
+				$response['body'] = helpPage( $config );
+			}
 			echo json_encode( $response );
 			exit;
 		default: $response['status'] = 404; $content = '<div class="pkg-card pkg-empty"><h2 class="pkg-h2">Not found</h2><a class="pkg-btn" href="/">Home</a></div>';

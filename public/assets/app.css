@@ -83,7 +83,7 @@ html.dark {
 .pkg *, .page * { box-sizing:border-box; }
 .pkg h1,.pkg h2,.pkg h3,.pkg h4 { margin:0; font-family:var(--n-font); color:var(--n-ink); }
 .pkg h1,.pkg h2 { font-family:var(--n-display); font-weight:600; letter-spacing:-.02em; }
-.pkg a { text-decoration:none; color:inherit; }
+.pkg :where(a) { text-decoration:none; color:inherit; }
 .pkg button { font-family:inherit; }
 .num { font-variant-numeric:tabular-nums; font-feature-settings:"tnum"; letter-spacing:-0.01em; }
 
@@ -546,7 +546,7 @@ html.dark .pkg-badge--danger { color:var(--n-coral); }
 .page *, .page *::before, .page *::after { box-sizing:border-box; }
 .page h1, .page h2, .page h3, .page h4 { margin:0; font-family:var(--n-display); font-weight:600; color:var(--n-ink); letter-spacing:-.02em; }
 .page p { margin:0; }
-.page a { text-decoration:none; color:inherit; }
+.page :where(a) { text-decoration:none; color:inherit; }
 .page button { font-family:inherit; }
 
 /* Editorial helpers */
