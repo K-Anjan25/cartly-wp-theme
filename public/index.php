@@ -1896,20 +1896,19 @@ $content = ''; $title = $config['name']; $active = 'dashboard';
 		case '/treds': $title = 'Finance queue'; $active = 'treds'; $content = viewTreds( $app ); break;
 		case '/reports': $title = 'Reports'; $active = 'reports'; $content = viewReports( $app, $config ); break;
 		case '/settings': $title = 'Settings'; $active = 'settings'; $content = viewSettings( $app, $config ); break;
-		case '/help': $title = 'Help'; $active = 'help'; $content = helpPage( $config ); break;
-		case '/contact': $title = 'Contact'; $active = 'contact'; $content = contactPage( $config ); break;
+		// Public pages - redirect logged-in users to standalone versions
+		case '/help': case '/contact': case '/pricing':
 		case '/terms': case '/privacy': case '/security':
-			$response['status'] = 302;
-			$response['location'] = '/';
+			$response['status']   = 302;
+			$response['location'] = $path;
 			echo json_encode( $response );
 			exit;
-		case '/pricing': $title = 'Pricing'; $active = 'pricing'; $content = pricingPage( $config ); break;
 		default: $response['status'] = 404; $content = '<div class="pkg-card pkg-empty"><h2 class="pkg-h2">Not found</h2><a class="pkg-btn" href="/">Home</a></div>';
 	}
 
-$config['business'] = $app->business()['name'] ?? $config['name'];
-$response['body'] = layout( $config, $title, $content, $active, $app->dashboard(), $user );
-echo json_encode( $response );
+	$config['business'] = $app->business()['name'] ?? $config['name'];
+	$response['body'] = layout( $config, $title, $content, $active, $app->dashboard(), $user );
+	echo json_encode( $response );
 
 function redirect( string $loc, array &$response ): void {
 	$response['status']   = 302;
