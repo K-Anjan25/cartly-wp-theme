@@ -91,6 +91,9 @@ VITEST=1 node serve.mjs
 - `/buyers`, `/buyers/new`
 - `/treds` finance queue, `/reports`, `/settings`
 - `/pricing` public pricing page (also reachable from the sidebar "Upgrade to Pro" / "See pricing" card)
+- `/news/{slug}` public news articles (seeded from `paykaroNews()`; the landing
+  page's "News & updates" cards link here). Bare `/news` or an unknown slug
+  redirects to the landing page's news section (`/#news`).
 - `/login`, `/signup`, `/auth/google`, `/auth/google/callback`, `/logout` (POST), `/alerts/read` (POST — dismisses the dashboard "Needs attention" list)
 
 ## Sandbox seed helper

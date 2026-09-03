@@ -449,6 +449,176 @@ function signupPage( array $config ): string {
 	return ob_get_clean();
 }
 
+/* News & updates — single source of truth for the landing-page cards and the
+   standalone /news/{slug} article pages. Body blocks: array( 'p'|'h2', text ). */
+function paykaroNews(): array {
+	return array(
+		array(
+			'slug'    => 'evidence-checklist',
+			'tag'     => 'Product',
+			'date'    => '02 Sep 2026',
+			'title'   => 'Every invoice, dated and dated twice.',
+			'excerpt' => 'The new evidence checklist ties purchase order, delivery ack, GRN and GST copy to each invoice — and refuses to mark an invoice "ready" until the trail is complete.',
+			'image'   => '/assets/img/card-invoices.jpg',
+			'alt'     => 'Invoice paperwork on a desk',
+			'body'    => array(
+				array( 'p', 'When a buyer delays a payment, almost every dispute comes down to one question: prove when. When was the invoice raised? When were the goods delivered? When did the buyer accept them? Those dates decide when the statutory interest clock starts — and whether a delayed-payment claim stands or collapses.' ),
+				array( 'p', 'The heart of PayKaro has always been dates. Starting this week, the evidence behind those dates is a first-class part of every invoice.' ),
+				array( 'h2', 'One checklist, four documents, zero arguments' ),
+				array( 'p', 'Every invoice now carries an evidence checklist: purchase order, delivery acknowledgement, goods receipt note (GRN) and a GST-valid invoice copy — plus an optional contract. Each item is a dated fact you confirm as the paperwork arrives, not a folder you hope to find later.' ),
+				array( 'p', 'The checklist feeds the invoice\'s readiness score directly. Evidence completeness carries 70% of the score; the buyer\'s TReDS onboarding status carries most of the rest. An invoice only reaches "ready to finance" when the trail is complete — so the finance queue can separate what can move today from what\'s held back by one missing GRN.' ),
+				array( 'h2', 'Why it matters for claims' ),
+				array( 'p', 'Under the MSMED framework, interest on delayed payments runs at three times the bank rate, calculated from the agreed date or deemed acceptance — but only if you can prove acceptance happened. A delivery acknowledgement with a date on it turns "they took the goods in July" into a number the forum accepts.' ),
+				array( 'p', 'The claim packet builder assembles the checklist into a filing-ready summary: invoice, buyer, amounts, days overdue, interest due and the evidence trail — with the deadline for the MSEFC forum or arbitration computed from the due date.' ),
+				array( 'h2', 'Try it in the demo' ),
+				array( 'p', 'Sign in to the demo workspace, open any invoice and tick the evidence items. Watch the readiness score and the finance queue react immediately.' ),
+			),
+		),
+		array(
+			'slug'    => 'metrow-ceramics-financing',
+			'tag'     => 'Customers',
+			'date'    => '27 Aug 2026',
+			'title'   => 'How MetRow Ceramics financed 60% of receivables in week one.',
+			'excerpt' => 'When the buyer\'s TReDS onboarding cleared, four invoices were ready to discount the same afternoon. Here\'s the workflow that made it possible.',
+			'image'   => '/assets/img/card-team.jpg',
+			'alt'     => 'Team collaborating in a modern office',
+			'body'    => array(
+				array( 'p', 'MetRow Ceramics supplies precision ceramic components to Delhi Metro\'s vendor chain and to private real-estate builders. Like most small manufacturers, they ran receivables from a spreadsheet, a WhatsApp folder and memory. In their first week on PayKaro, they converted their largest open invoice into cash.' ),
+				array( 'h2', 'Day one: get the book in' ),
+				array( 'p', 'Farhan raised three invoices — two against Delhi Metro Rail Corp, a PSU buyer already onboarded on TReDS, and one against a private builder. Each went in with its purchase order and delivery acknowledgement; the GRNs were confirmed the same evening. Total open receivables: a little over ₹9.2 lakh.' ),
+				array( 'h2', 'The queue did the triage' ),
+				array( 'p', 'The finance queue flagged the largest Delhi Metro invoice "ready to finance" — evidence complete, buyer onboarded. The builder invoice stayed out of the queue\'s ready pile: that buyer isn\'t on TReDS, so discounting it was never on the table this quarter. Instead, PayKaro kept accruing statutory interest on it as it aged past the 45-day window.' ),
+				array( 'h2', 'Same week, cash in the bank' ),
+				array( 'p', 'With the packet complete, their financier discounted the Delhi Metro invoice within days — no back-and-forth over documents, because every document was already attached, dated and checked. The disbursal was recorded against the invoice, moved it to "financed", and left the balance sheet honest.' ),
+				array( 'p', 'The pattern is the point: complete evidence makes an invoice financeable the day it\'s raised. A TReDS-ready buyer makes it discountable. Everything else keeps earning interest.' ),
+				array( 'p', 'MetRow Ceramics is one of the two demo businesses seeded in the PayKaro workspace — sign in with the MetRow login and this exact book is sitting in the data.' ),
+			),
+		),
+		array(
+			'slug'    => 'msme-rules-2026',
+			'tag'     => 'Regulation',
+			'date'    => '21 Aug 2026',
+			'title'   => 'The 2026 MSME rules: what changes for suppliers this quarter.',
+			'excerpt' => 'TReDS mandates tighten for CPSE buyers and the delayed-payment forum gets teeth. We break down what it means for your invoices.',
+			'image'   => '/assets/img/impact-growth.jpg',
+			'alt'     => 'Analyst reviewing growth charts on a laptop',
+			'body'    => array(
+				array( 'p', 'The 2026 MSME Development (Amendment) Bill has cleared committee, and it changes the arithmetic for every small supplier in India. Three shifts matter this quarter.' ),
+				array( 'h2', '1. TReDS mandates tighten for CPSE buyers' ),
+				array( 'p', 'Central public sector enterprises above the notification threshold are required to onboard and transact on TReDS. For suppliers that is good news with a catch: an invoice can only be discounted when both parties are onboarded. Knowing which of your buyers are ready is now a financing decision, not trivia.' ),
+				array( 'h2', '2. The delayed-payment forum gets teeth' ),
+				array( 'p', 'The MSEFC forum process is time-bound, and statutory interest on delayed payments — three times the prevailing bank rate, applied from the reference date — is enforced rather than theoretical. A supplier with dated evidence of delivery and acceptance walks in with leverage. One without it negotiates with hope.' ),
+				array( 'h2', '3. The 45-day window is the default' ),
+				array( 'p', 'Payments to MSMEs fall due within 45 days unless a written agreement says otherwise — and "otherwise" cannot be worse than the buyer\'s own standards for similar purchases. Ageing should be computed from the invoice itself, not reconstructed months later.' ),
+				array( 'h2', 'What to do this quarter' ),
+				array( 'p', 'One: audit your top buyers\' TReDS status before you plan financing around them. Two: close the evidence gaps on every open invoice — purchase order, delivery acknowledgement, GRN, GST-valid copy. Three: compute the interest you are owed from the invoice dates, so the number is ready the day you need it.' ),
+				array( 'p', 'PayKaro bakes all three in: a 45-day due window on every invoice, daily interest accrual at three times the bank rate, a TReDS queue that separates ready from blocked, and a claim packet with the forum deadline computed for you.' ),
+				array( 'p', 'This article is a plain-language summary written for the PayKaro demo workspace, not legal advice. The interest rate (3× a 6.5% bank rate) and windows shown in the demo follow the app\'s configuration.' ),
+			),
+		),
+	);
+}
+
+/* Standalone news article page (public, /news/{slug}). */
+function newsArticlePage( array $config, array $article ): string {
+	ob_start();
+	?>
+	<!doctype html>
+	<html lang="en">
+	<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title><?php echo e( $article['title'] ); ?> — <?php echo e( $config['name'] ); ?></title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="/assets/app.css">
+	</head>
+	<body class="page">
+	<div class="pkg-util">
+		<div class="pkg-util-inner">
+			<span class="pkg-util-tag"><span class="dot"></span> MSME receivables</span>
+			<div class="pkg-util-right">
+				<a href="/#news">All news</a>
+				<span class="pkg-util-sep"></span>
+				<a href="/">Back to home</a>
+				<span class="pkg-util-sep"></span>
+				<a href="/login">Sign in</a>
+			</div>
+		</div>
+	</div>
+	<header class="pkg-head">
+		<div class="pkg-head-inner">
+			<div class="pkg-bars" aria-hidden="true">
+				<span class="bar-thick"></span>
+				<span class="bar-thin"></span>
+			</div>
+			<a class="pkg-brand" href="/" aria-label="PayKaro home">
+				<?php echo logoMark(); ?>
+				<div class="pkg-brand-text">
+					<div class="name"><?php echo brandWordmark(); ?></div>
+					<div class="sub">MSME invoice &amp; receivables tracker</div>
+				</div>
+			</a>
+			<nav class="pkg-nav" aria-label="Primary">
+				<a href="/#workflow">Workflow</a>
+				<a href="/#finance">Financing</a>
+				<a class="is-active" href="/#news">News</a>
+				<a href="/#impact">Impact</a>
+				<a href="/pricing">Pricing</a>
+			</nav>
+			<div class="pkg-head-right">
+				<a class="pbtn pbtn-outline pbtn-sm" href="/login">Sign in</a>
+				<a class="pbtn pbtn-primary pbtn-sm" href="/signup">Get started</a>
+			</div>
+		</div>
+		<div class="pkg-headline" aria-hidden="true"></div>
+	</header>
+	<main>
+		<section class="sec" style="padding:3.2rem 0 3.5rem;">
+			<div class="container">
+				<a class="pbtn pbtn-outline pbtn-sm" href="/#news">← All news</a>
+				<div class="article-wrap">
+					<p class="article-meta"><span class="tag"><?php echo e( $article['tag'] ); ?></span> <?php echo e( $article['date'] ); ?></p>
+					<h1 class="article-title"><?php echo e( $article['title'] ); ?></h1>
+					<p class="article-dek"><?php echo e( $article['excerpt'] ); ?></p>
+				</div>
+				<div class="article-hero">
+					<img src="<?php echo e( $article['image'] ); ?>" alt="<?php echo e( $article['alt'] ); ?>">
+				</div>
+				<div class="article-body">
+					<?php foreach ( $article['body'] as $block ) : ?>
+						<?php if ( 'h2' === $block[0] ) : ?>
+							<h2><?php echo e( $block[1] ); ?></h2>
+						<?php else : ?>
+							<p><?php echo e( $block[1] ); ?></p>
+						<?php endif; ?>
+					<?php endforeach; ?>
+				</div>
+				<div class="article-cta">
+					<p class="eyebrow eyebrow--on-dark">See it with your own invoices</p>
+					<h2 class="display">Turn your receivables into finance-ready assets.</h2>
+					<p>Track what's owed, what's overdue and what you could finance today — with the evidence and interest numbers that make a claim stand.</p>
+					<div style="margin-top:1.3rem;display:flex;gap:.7rem;justify-content:center;flex-wrap:wrap;">
+						<a class="pbtn pbtn-primary" href="/signup">Start free</a>
+						<a class="pbtn pbtn-ghost" href="/login">Sign in to the demo</a>
+					</div>
+				</div>
+			</div>
+		</section>
+	</main>
+	<footer class="page-footer">
+		<div class="page-footer-bottom">
+			<span>© <?php echo e( date( 'Y' ) ); ?> PayKaro · Made for India's MSMEs</span>
+			<span><a href="/#news" style="color:var(--n-gold);">More news</a> · <a href="/" style="color:var(--n-gold);">Back to home</a></span>
+		</div>
+	</footer>
+	</body>
+	</html>
+	<?php
+	return ob_get_clean();
+}
+
 /* Public landing page — editorial / UFL-inspired home. */
 function landingPage( array $config ): string {
 	ob_start();
@@ -663,33 +833,17 @@ function landingPage( array $config ): string {
 					<p class="lede">What we're shipping, what we're seeing in the field, and the small changes that keep Indian MSMEs in the money.</p>
 				</div>
 				<div class="news-grid">
-					<article class="news-card">
-						<div class="img"><img src="/assets/img/card-invoices.jpg" alt="Invoice paperwork on a desk"></div>
-						<div class="body">
-							<p class="meta"><span class="tag">Product</span> 02 Sep 2026</p>
-							<h3>Every invoice, dated and dated twice.</h3>
-							<p>The new evidence checklist ties purchase order, delivery ack, GRN and GST copy to each invoice — and refuses to mark an invoice "ready" until the trail is complete.</p>
-							<span class="more">Read more</span>
-						</div>
-					</article>
-					<article class="news-card">
-						<div class="img"><img src="/assets/img/card-team.jpg" alt="Team collaborating in a modern office"></div>
-						<div class="body">
-							<p class="meta"><span class="tag">Customers</span> 27 Aug 2026</p>
-							<h3>How MetRow Ceramics financed 60% of receivables in week one.</h3>
-							<p>When the buyer's TReDS onboarding cleared, four invoices were ready to discount the same afternoon. Here's the workflow that made it possible.</p>
-							<span class="more">Read more</span>
-						</div>
-					</article>
-					<article class="news-card">
-						<div class="img"><img src="/assets/img/impact-growth.jpg" alt="Analyst reviewing growth charts on a laptop"></div>
-						<div class="body">
-							<p class="meta"><span class="tag">Regulation</span> 21 Aug 2026</p>
-							<h3>The 2026 MSME rules: what changes for suppliers this quarter.</h3>
-							<p>TReDS mandates tighten for CPSE buyers and the delayed-payment forum gets teeth. We break down what it means for your invoices.</p>
-							<span class="more">Read more</span>
-						</div>
-					</article>
+					<?php foreach ( paykaroNews() as $a ) : ?>
+						<article class="news-card">
+							<div class="img"><img src="<?php echo e( $a['image'] ); ?>" alt="<?php echo e( $a['alt'] ); ?>"></div>
+							<div class="body">
+								<p class="meta"><span class="tag"><?php echo e( $a['tag'] ); ?></span> <?php echo e( $a['date'] ); ?></p>
+								<h3><?php echo e( $a['title'] ); ?></h3>
+								<p><?php echo e( $a['excerpt'] ); ?></p>
+								<a class="more" href="/news/<?php echo e( $a['slug'] ); ?>">Read more</a>
+							</div>
+						</article>
+					<?php endforeach; ?>
 				</div>
 			</div>
 		</section>
@@ -1818,6 +1972,28 @@ if ( '/auth/google/callback' === $path ) {
 	$response['status']   = 302;
 	$response['location'] = '/';
 	$response['cookies'][] = array( COOKIE_NAME, $session, (int) $config['session_ttl'] );
+	echo json_encode( $response );
+	exit;
+}
+
+// ---- GET: news articles (public — same pages for signed-in and anonymous) ----
+if ( '/news' === $path || str_starts_with( $path, '/news/' ) ) {
+	$slug    = substr( $path, strlen( '/news/' ) ); // '' for bare /news, slug otherwise.
+	$article = null;
+	foreach ( paykaroNews() as $a ) {
+		if ( $a['slug'] === $slug ) {
+			$article = $a;
+			break;
+		}
+	}
+	if ( $article ) {
+		$response['status'] = 200;
+		$response['body']   = newsArticlePage( $config, $article );
+	} else {
+		// Bare /news or an unknown slug — land back on the news section.
+		$response['status']   = 302;
+		$response['location'] = '/#news';
+	}
 	echo json_encode( $response );
 	exit;
 }

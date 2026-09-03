@@ -766,6 +766,22 @@ html.dark .pkg-badge--danger { color:var(--n-coral); }
 .news-card .more::after { content:"→"; transition:transform .15s; }
 .news-card:hover .more::after { transform:translateX(3px); }
 
+/* Standalone news article (/news/{slug}) */
+.article-wrap { max-width:46rem; margin:1.6rem auto 0; }
+.article-meta { display:flex; align-items:center; gap:.6rem; font-size:.74rem; text-transform:uppercase; letter-spacing:.12em; color:var(--n-blue); font-weight:800; }
+.article-meta .tag { background:var(--n-blue-soft); border-radius:999px; padding:.2rem .6rem; }
+.article-title { font-family:var(--n-display); font-weight:600; font-size:clamp(1.9rem,4vw,2.8rem); line-height:1.1; letter-spacing:-.025em; color:var(--n-ink); margin:.8rem 0 .9rem; }
+.article-dek { color:var(--n-ink-soft); font-size:1.1rem; line-height:1.6; }
+.article-hero { max-width:56rem; margin:2.2rem auto 0; border-radius:18px; overflow:hidden; border:1px solid var(--n-line); }
+.article-hero img { width:100%; aspect-ratio:16/7; object-fit:cover; display:block; }
+.article-body { max-width:44rem; margin:0 auto; padding:2.6rem 1.5rem 0; font-size:1.04rem; line-height:1.78; color:var(--n-ink-soft); }
+.article-body h2 { font-family:var(--n-display); font-weight:600; color:var(--n-ink); font-size:1.45rem; letter-spacing:-.02em; margin:2.4rem 0 .9rem; }
+.article-body p { margin:0 0 1.2rem; }
+.article-cta { max-width:44rem; margin:2.6rem auto 0; background:var(--n-blue-deep); color:#fff; border-radius:18px; padding:2.4rem 2rem; text-align:center; }
+.article-cta .display { color:#fff; font-size:clamp(1.5rem,2.6vw,2rem); margin-top:.6rem; }
+.article-cta p:not(.eyebrow) { color:rgba(255,255,255,.78); margin-top:.6rem; font-size:1rem; }
+@media (max-width:720px) { .article-body { padding:2rem 0 0; } .article-cta { margin-bottom:0; } }
+
 /* "Headlines" list (editorial links list) */
 .headlines { list-style:none; margin:0; padding:0; }
 .headlines li { padding:1.1rem 0; border-bottom:1px solid var(--n-line); display:flex; gap:1rem; align-items:flex-start; }
