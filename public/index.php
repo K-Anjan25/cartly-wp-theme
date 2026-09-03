@@ -1543,6 +1543,9 @@ function viewInvoiceForm( PayKaro $app, array $config, ?int $editId = null ): st
 	ob_start();
 	?>
 	<?php echo pageHeader( $inv ? 'Edit invoice ' . e( $inv['number'] ) : 'Raise an invoice', $inv ? 'Edit the invoice details.' : 'Most fields are prefilled for you.' ); ?>
+	<?php if ( 'invalid' === ( $_GET['err'] ?? '' ) ) : ?>
+		<div class="pkg-callout pkg-callout--coral" style="margin-bottom:1rem;"><strong>Invoice not saved.</strong> Fill in the invoice number and date, pick one of your buyers, and enter a base amount greater than zero.</div>
+	<?php endif; ?>
 	<?php if ( ! $buyers ) : ?>
 		<div class="pkg-card pkg-empty"><h2 class="pkg-h2">Add a buyer first</h2><p class="pkg-sub">Invoices reference a buyer.</p><a class="pkg-btn pkg-btn--primary" href="/buyers/new">+ Add buyer</a></div>
 		<?php return ob_get_clean(); ?>
@@ -1584,6 +1587,9 @@ function viewBuyerForm( PayKaro $app ): string {
 	ob_start();
 	?>
 	<?php echo pageHeader( 'Add a buyer' ); ?>
+	<?php if ( 'invalid' === ( $_GET['err'] ?? '' ) ) : ?>
+		<div class="pkg-callout pkg-callout--coral" style="margin-bottom:1rem;"><strong>Buyer not saved.</strong> A buyer name is required.</div>
+	<?php endif; ?>
 	<form method="post" action="/buyers" class="pkg-card pkg-form">
 		<div class="pkg-grid pkg-grid--2">
 			<div class="pkg-field pkg-field--full"><label class="pkg-label">Buyer name</label><input class="pkg-input" name="name" required></div>
@@ -1835,22 +1841,27 @@ $app->setTenant( (int) ( $user['business_id'] ?? 0 ) );
 // ---- POST mutations (auth required) ----
 if ( 'POST' === $method ) {
 	$action = $p['action'] ?? '';
-		if ( '/invoice' === $path ) {
-			$id = (int) ( $p['id'] ?? 0 );
-			if ( 'status' === $action ) { $app->setStatus( $id, $p['status'] ?? 'raised' ); $loc = '/invoice?id=' . $id; }
-			elseif ( 'evidence' === $action ) { $app->setEvidence( $id, $p['type'] ?? 'po', ! empty( $p['present'] ) ); $loc = '/invoice?id=' . $id; }
-			elseif ( 'payment' === $action ) { $app->recordPayment( $id, $p ); $loc = '/invoice?id=' . $id; }
-			elseif ( 'finance' === $action ) { $app->recordFinancing( $id, $p ); $loc = '/invoice?id=' . $id; }
-			elseif ( 'dispute' === $action ) { $app->startDispute( $id, $p ); $loc = '/invoice?id=' . $id; }
-			elseif ( 'update' === $action ) { $app->updateInvoice( $id, $p ); $loc = '/invoice?id=' . $id; }
-			else { $id = $app->createInvoice( $p ); $loc = '/invoice?id=' . $id; }
-			redirect( $loc, $response );
+	if ( '/invoice' === $path ) {
+		$id = (int) ( $p['id'] ?? 0 );
+		if ( 'status' === $action ) { $app->setStatus( $id, $p['status'] ?? 'raised' ); $loc = '/invoice?id=' . $id; }
+		elseif ( 'evidence' === $action ) { $app->setEvidence( $id, $p['type'] ?? 'po', ! empty( $p['present'] ) ); $loc = '/invoice?id=' . $id; }
+		elseif ( 'payment' === $action ) { $app->recordPayment( $id, $p ); $loc = '/invoice?id=' . $id; }
+		elseif ( 'finance' === $action ) { $app->recordFinancing( $id, $p ); $loc = '/invoice?id=' . $id; }
+		elseif ( 'dispute' === $action ) { $app->startDispute( $id, $p ); $loc = '/invoice?id=' . $id; }
+		elseif ( 'update' === $action ) { $app->updateInvoice( $id, $p ); $loc = '/invoice?id=' . $id; }
+		else {
+			// createInvoice() returns 0 on an invalid payload — bounce back
+			// to the form with a message instead of fataling.
+			$newId = $app->createInvoice( $p );
+			$loc   = $newId > 0 ? '/invoice?id=' . $newId : '/invoices/new?err=invalid';
+		}
+		redirect( $loc, $response );
 		echo json_encode( $response );
 		exit;
 	}
 	if ( '/buyers' === $path ) {
-		$app->createBuyer( $p );
-		redirect( '/buyers', $response );
+		$buyerId = $app->createBuyer( $p );
+		redirect( $buyerId > 0 ? '/buyers' : '/buyers/new?err=invalid', $response );
 		echo json_encode( $response );
 		exit;
 	}
@@ -1885,7 +1896,12 @@ $content = ''; $title = $config['name']; $active = 'dashboard';
 			// Edit mode: canonical `/invoice?edit=ID` or legacy `/invoice?id=ID&edit=1`.
 			if ( isset( $g['edit'] ) ) {
 				$editId  = ! empty( $g['id'] ) ? (int) $g['id'] : (int) $g['edit'];
-				$content = viewInvoiceForm( $app, $config, $editId );
+				// Editing an invoice that doesn't exist (or belongs to another
+				// tenant) must say so — not silently fall back to a blank
+				// create form.
+				$content = $app->invoice( $editId )
+					? viewInvoiceForm( $app, $config, $editId )
+					: '<div class="pkg-card pkg-empty"><h2 class="pkg-h2">Invoice not found</h2><a class="pkg-btn" href="/invoices">Back to invoices</a></div>';
 			} else {
 				$content = viewInvoice( $app, $config, (int) ( $g['id'] ?? 0 ) );
 			}

@@ -104,6 +104,16 @@ npm install
 VITEST=1 node seed.mjs   # idempotent; writes data/paykaro.sqlite
 ```
 
+## Sandbox lint helper
+
+The CI lints with native `php -l`. Without a native PHP binary, lint every
+PHP file through the same php-wasm runtime the bridge uses:
+
+```bash
+cd bridge
+VITEST=1 node lint.mjs ../PayKaro.php ../public/index.php   # any repo .php file(s)
+```
+
 ## Layout
 
 ```

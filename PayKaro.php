@@ -263,9 +263,25 @@ class PayKaro
 		return (float) $stmt->fetchColumn();
 	}
 
+	/**
+	 * Create a buyer for the current tenant. Returns the new id, or 0 when the
+	 * payload is invalid (missing name / unknown enum values are never written).
+	 */
 	public function createBuyer( array $d ): int {
+		$name   = trim( (string) ( $d['name'] ?? '' ) );
+		$type   = (string) ( $d['type'] ?? 'private' );
+		$treds  = (string) ( $d['treds_onboarded'] ?? 'unknown' );
+		if ( '' === $name ) {
+			return 0;
+		}
+		if ( ! in_array( $type, array( 'cpse', 'psu', 'private' ), true ) ) {
+			$type = 'private';
+		}
+		if ( ! in_array( $treds, array( 'unknown', 'yes', 'no' ), true ) ) {
+			$treds = 'unknown';
+		}
 		$stmt = $this->db->prepare( 'INSERT INTO buyers (business_id,name,gstin,type,treds_onboarded) VALUES (?,?,?,?,?)' );
-		$stmt->execute( array( $this->tid(), $d['name'], $d['gstin'] ?? '', $d['type'] ?? 'private', $d['treds_onboarded'] ?? 'unknown' ) );
+		$stmt->execute( array( $this->tid(), $name, (string) ( $d['gstin'] ?? '' ), $type, $treds ) );
 		return (int) $this->db->lastInsertId();
 	}
 
@@ -338,16 +354,34 @@ class PayKaro
 		return $rows;
 	}
 
+	/**
+	 * Create an invoice for the current tenant. Returns the new id, or 0 when
+	 * the payload is invalid — a malformed POST must never fatal (it used to
+	 * die with a TypeError on a missing invoice_date) and must never reference
+	 * another tenant's buyer.
+	 */
 	public function createInvoice( array $d ): int {
-		$base  = (float) $d['base_amount'];
-		$tax   = (float) ( $d['tax_amount'] ?? ( $base * $this->config['default_tax_rate'] / 100 ) );
+		$number  = trim( (string) ( $d['number'] ?? '' ) );
+		$date    = (string) ( $d['invoice_date'] ?? '' );
+		$base    = isset( $d['base_amount'] ) ? (float) $d['base_amount'] : 0.0;
+		$buyerId = (int) ( $d['buyer_id'] ?? 0 );
+
+		if ( '' === $number || ! $this->validDate( $date ) || $base <= 0 ) {
+			return 0;
+		}
+		// The buyer must belong to this tenant (no cross-tenant references).
+		if ( ! $this->buyer( $buyerId ) ) {
+			return 0;
+		}
+		$taxIn = isset( $d['tax_amount'] ) ? trim( (string) $d['tax_amount'] ) : '';
+		$tax   = '' !== $taxIn && (float) $taxIn >= 0 ? (float) $taxIn : $base * $this->config['default_tax_rate'] / 100;
 		$total = $base + $tax;
-		$due   = $this->addDays( $d['invoice_date'], (int) $this->config['msme_due_days'] );
+		$due   = $this->addDays( $date, (int) $this->config['msme_due_days'] );
 		$stmt  = $this->db->prepare(
 			'INSERT INTO invoices (business_id,buyer_id,number,invoice_date,due_date,base_amount,tax_amount,total_amount,status,notes)
-			 VALUES (?,?,?,?,?,?,?,?,?,?)'
+		 VALUES (?,?,?,?,?,?,?,?,?,?)'
 		);
-		$stmt->execute( array( $this->tid(), (int) $d['buyer_id'], $d['number'], $d['invoice_date'], $due, $base, $tax, $total, 'raised', $d['notes'] ?? '' ) );
+		$stmt->execute( array( $this->tid(), $buyerId, $number, $date, $due, $base, $tax, $total, 'raised', (string) ( $d['notes'] ?? '' ) ) );
 		$id = (int) $this->db->lastInsertId();
 		$this->seedEvidences( $id );
 		$this->createAlerts( $id );
@@ -360,19 +394,32 @@ class PayKaro
 		if ( ! $inv ) {
 			return false;
 		}
-		$base = (float) ( $d['base_amount'] ?? $inv['base_amount'] );
-		$tax  = (float) ( $d['tax_amount'] ?? ( $base * $this->config['default_tax_rate'] / 100 ) );
+		// Provided values are validated; invalid ones fall back to the stored
+		// invoice so a malformed POST can never corrupt the record.
+		$number = trim( (string) ( $d['number'] ?? $inv['number'] ) );
+		$number = '' !== $number ? $number : (string) $inv['number'];
+		$date   = (string) ( $d['invoice_date'] ?? $inv['invoice_date'] );
+		if ( ! $this->validDate( $date ) ) {
+			$date = (string) $inv['invoice_date'];
+		}
+		$base = isset( $d['base_amount'] ) && (float) $d['base_amount'] > 0 ? (float) $d['base_amount'] : (float) $inv['base_amount'];
+		$taxIn = isset( $d['tax_amount'] ) ? trim( (string) $d['tax_amount'] ) : '';
+		$tax   = '' !== $taxIn && (float) $taxIn >= 0 ? (float) $taxIn : $base * $this->config['default_tax_rate'] / 100;
 		$total = $base + $tax;
-		$date = $d['invoice_date'] ?? $inv['invoice_date'];
-		$due  = $this->addDays( $date, (int) $this->config['msme_due_days'] );
-		$stmt = $this->db->prepare(
+		$due   = $this->addDays( $date, (int) $this->config['msme_due_days'] );
+		// Buyer must belong to this tenant; otherwise keep the stored buyer.
+		$buyerId = (int) ( $d['buyer_id'] ?? $inv['buyer_id'] );
+		if ( ! $this->buyer( $buyerId ) ) {
+			$buyerId = (int) $inv['buyer_id'];
+		}
+		$stmt  = $this->db->prepare(
 			'UPDATE invoices SET number=?, buyer_id=?, invoice_date=?, due_date=?, base_amount=?, tax_amount=?, total_amount=?, notes=? WHERE id=? AND business_id=?'
 		);
 		$stmt->execute( array(
-			$d['number'] ?? $inv['number'],
-			(int) ( $d['buyer_id'] ?? $inv['buyer_id'] ),
+			$number,
+			$buyerId,
 			$date, $due, $base, $tax, $total,
-			$d['notes'] ?? $inv['notes'],
+			(string) ( $d['notes'] ?? $inv['notes'] ),
 			$id, $this->tid(),
 		) );
 		return true;
@@ -388,6 +435,16 @@ class PayKaro
 	}
 
 	public function setEvidence( int $invoiceId, string $type, bool $present ): void {
+		// Tenant guard: only touch evidence rows for invoices this business
+		// owns (invoice ids come straight from the POST body).
+		if ( ! $this->invoice( $invoiceId ) ) {
+			return;
+		}
+		// Whitelist the evidence type.
+		$valid = array_values( array_unique( array_merge( (array) $this->config['required_evidence'], array( 'contract' ) ) ) );
+		if ( ! in_array( $type, $valid, true ) ) {
+			return;
+		}
 		$stmt = $this->db->prepare( 'UPDATE invoice_evidences SET present=? WHERE invoice_id=? AND type=?' );
 		$stmt->execute( array( $present ? 1 : 0, $invoiceId, $type ) );
 	}
@@ -434,7 +491,7 @@ class PayKaro
 	}
 
 	public function recordPayment( int $invoiceId, array $d ): void {
-		$amount = (float) $d['amount'];
+		$amount = (float) ( $d['amount'] ?? 0 );
 		if ( $amount <= 0 ) {
 			return;
 		}
@@ -444,8 +501,12 @@ class PayKaro
 		}
 		$paid = $this->paidTotal( $invoiceId );
 		$bal  = (float) $inv['total_amount'] - $paid;
+		$paidOn = (string) ( $d['paid_on'] ?? '' );
+		if ( ! $this->validDate( $paidOn ) ) {
+			$paidOn = date( 'Y-m-d' );
+		}
 		$stmt = $this->db->prepare( 'INSERT INTO payments (invoice_id,amount,paid_on,method,reference) VALUES (?,?,?,?,?)' );
-		$stmt->execute( array( $invoiceId, min( $amount, $bal ), $d['paid_on'] ?? date( 'Y-m-d' ), $d['method'] ?? '', $d['reference'] ?? '' ) );
+		$stmt->execute( array( $invoiceId, min( $amount, $bal ), $paidOn, (string) ( $d['method'] ?? '' ), (string) ( $d['reference'] ?? '' ) ) );
 		if ( (float) $inv['total_amount'] - $this->paidTotal( $invoiceId ) <= 0.001 ) {
 			$this->setStatus( $invoiceId, 'settled' );
 		}
@@ -463,9 +524,17 @@ class PayKaro
 			return;
 		}
 		$rate = (float) ( $d['discount_rate'] ?? 1.5 );
-		$amt  = (float) ( $d['amount_disbursed'] ?? $inv['total_amount'] );
+		if ( $rate < 0 ) {
+			$rate = 0.0;
+		}
+		$amtIn = isset( $d['amount_disbursed'] ) ? trim( (string) $d['amount_disbursed'] ) : '';
+		$amt   = '' !== $amtIn && (float) $amtIn > 0 ? (float) $amtIn : (float) $inv['total_amount'];
+		$on    = (string) ( $d['disbursed_on'] ?? '' );
+		if ( ! $this->validDate( $on ) ) {
+			$on = date( 'Y-m-d' );
+		}
 		$this->db->prepare( 'INSERT INTO financing (invoice_id,financier,discount_rate,amount_disbursed,disbursed_on,status) VALUES (?,?,?,?,?,?)' )
-			->execute( array( $invoiceId, $d['financier'] ?? 'Bank', $rate, $amt, $d['disbursed_on'] ?? date( 'Y-m-d' ), 'disbursed' ) );
+			->execute( array( $invoiceId, (string) ( $d['financier'] ?? 'Bank' ), $rate, $amt, $on, 'disbursed' ) );
 		$this->setStatus( $invoiceId, 'financed' );
 	}
 
@@ -476,12 +545,20 @@ class PayKaro
 	}
 
 	public function startDispute( int $invoiceId, array $d ): int {
-		$forum = $d['forum'] ?? 'msefc';
-		$inv   = $this->invoice( $invoiceId );
+		$inv = $this->invoice( $invoiceId );
+		if ( ! $inv ) {
+			// Tenant guard: never write a dispute row for an invoice this
+			// business doesn't own (the id comes from the POST body).
+			return 0;
+		}
+		$forum = (string) ( $d['forum'] ?? 'msefc' );
+		if ( ! in_array( $forum, array( 'msefc', 'mediation', 'arbitration' ), true ) ) {
+			$forum = 'msefc';
+		}
 		$deadline = null;
-		if ( $inv && 'msefc' === $forum ) {
+		if ( 'msefc' === $forum ) {
 			$deadline = date( 'Y-m-d', strtotime( $inv['due_date'] ) + 45 * 86400 );
-		} elseif ( $inv && 'arbitration' === $forum ) {
+		} elseif ( 'arbitration' === $forum ) {
 			$deadline = date( 'Y-m-d', strtotime( $inv['due_date'] ) + 90 * 86400 );
 		}
 		$this->db->prepare( 'INSERT INTO disputes (invoice_id,forum,stage,filed_on,deadline_on) VALUES (?,?,?,?,?)' )
@@ -705,6 +782,14 @@ class PayKaro
 
 	private function today(): string {
 		return date( 'Y-m-d' );
+	}
+
+	/** Strict YYYY-MM-DD check (real calendar date, not just strtotime-parseable). */
+	private function validDate( string $date ): bool {
+		if ( ! preg_match( '/^(\d{4})-(\d{2})-(\d{2})$/', $date, $m ) ) {
+			return false;
+		}
+		return checkdate( (int) $m[2], (int) $m[3], (int) $m[1] );
 	}
 
 	private function addDays( string $date, int $days ): string {
