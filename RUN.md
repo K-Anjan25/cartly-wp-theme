@@ -91,6 +91,9 @@ VITEST=1 node serve.mjs
 - `/buyers`, `/buyers/new`
 - `/treds` finance queue, `/reports`, `/settings`
 - `/pricing` public pricing page (also reachable from the sidebar "Upgrade to Pro" / "See pricing" card)
+- `/news/{slug}` public news articles (seeded from `paykaroNews()`; the landing
+  page's "News & updates" cards link here). Bare `/news` or an unknown slug
+  redirects to the landing page's news section (`/#news`).
 - `/login`, `/signup`, `/auth/google`, `/auth/google/callback`, `/logout` (POST), `/alerts/read` (POST — dismisses the dashboard "Needs attention" list)
 
 ## Sandbox seed helper
@@ -102,6 +105,16 @@ instead of `php bin/seed.php`:
 cd bridge
 npm install
 VITEST=1 node seed.mjs   # idempotent; writes data/paykaro.sqlite
+```
+
+## Sandbox lint helper
+
+The CI lints with native `php -l`. Without a native PHP binary, lint every
+PHP file through the same php-wasm runtime the bridge uses:
+
+```bash
+cd bridge
+VITEST=1 node lint.mjs ../PayKaro.php ../public/index.php   # any repo .php file(s)
 ```
 
 ## Layout
